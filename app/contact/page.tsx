@@ -1,4 +1,4 @@
-// app/contact/page.tsx - Modern Professional Contact Page
+// app/contact/page.tsx - Navy Blue & Gold Theme
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -17,7 +17,6 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     console.log('Form submitted:', formData);
     setSubmitted(true);
@@ -33,12 +32,12 @@ export default function ContactPage() {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <div className="relative h-[40vh] min-h-[300px] bg-gradient-to-r from-amber-900 via-orange-800 to-amber-900 flex items-center justify-center text-white overflow-hidden">
+      <div className="relative h-[40vh] min-h-[300px] bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 flex items-center justify-center text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1557425955-df376b33d09e?q=80&w=2070')] bg-cover bg-center mix-blend-overlay" />
+        <div className="absolute inset-0 bg-[url('/images/contact-hero.jpg')] bg-cover bg-center mix-blend-overlay" />
         <div className="relative z-10 text-center px-6">
           <h1 className="text-5xl md:text-6xl font-bold mb-4">Get in Touch</h1>
-          <p className="text-xl max-w-2xl mx-auto text-amber-100">We'd love to hear from you — reach out anytime</p>
+          <p className="text-xl max-w-2xl mx-auto text-blue-100">We'd love to hear from you — reach out anytime</p>
         </div>
       </div>
 
@@ -48,15 +47,15 @@ export default function ContactPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-20">
           {[
             { icon: "📞", title: "Call Us", info: "+1 (555) 678-2345", detail: "Mon-Fri, 9AM-6PM", action: "Call Now", link: "tel:+15556782345" },
-            { icon: "✉️", title: "Email Us", info: "hello@khorshidcommunity.org", detail: "Response within 24h", action: "Send Email", link: "mailto:hello@khorshidcommunity.org" },
-            { icon: "📍", title: "Visit Us", info: "123 Unity Avenue", detail: "Los Angeles, CA 90012", action: "Get Directions", link: "#map" },
+            { icon: "✉️", title: "Email Us", info: "info@khorshidcommunity.org", detail: "Response within 24h", action: "Send Email", link: "mailto:info@khorshidcommunity.org" },
+            { icon: "📍", title: "Visit Us", info: "Sky Beach", detail: "San Diego, CA", action: "Get Directions", link: "#map" },
           ].map((item, idx) => (
-            <a key={idx} href={item.link} className="group bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <a key={idx} href={item.link} className="group bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="text-5xl mb-3">{item.icon}</div>
               <h3 className="text-xl font-bold text-gray-800 mb-1">{item.title}</h3>
               <p className="text-gray-600 font-medium">{item.info}</p>
               <p className="text-sm text-gray-400 mb-3">{item.detail}</p>
-              <span className="inline-block text-amber-600 font-semibold text-sm group-hover:underline">{item.action} →</span>
+              <span className="inline-block text-yellow-600 font-semibold text-sm group-hover:underline">{item.action} →</span>
             </a>
           ))}
         </div>
@@ -66,9 +65,9 @@ export default function ContactPage() {
           {/* Contact Form - Left Column */}
           <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
             <div className="mb-8">
-              <span className="text-amber-600 font-semibold tracking-wide uppercase text-sm">Send a Message</span>
+              <span className="text-yellow-600 font-semibold tracking-wide uppercase text-sm">Send a Message</span>
               <h2 className="text-3xl font-bold text-gray-900 mt-2">We're Here to Help</h2>
-              <div className="w-20 h-1 bg-amber-500 rounded-full mt-3"></div>
+              <div className="w-20 h-1 bg-yellow-500 rounded-full mt-3"></div>
               <p className="text-gray-600 mt-4">Fill out the form below and our team will get back to you within 24 hours.</p>
             </div>
 
@@ -94,7 +93,7 @@ export default function ContactPage() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
+                    className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all"
                     placeholder="John Doe"
                   />
                 </div>
@@ -106,7 +105,7 @@ export default function ContactPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
+                    className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -120,7 +119,7 @@ export default function ContactPage() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all"
+                    className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all"
                     placeholder="(555) 123-4567"
                   />
                 </div>
@@ -131,7 +130,7 @@ export default function ContactPage() {
                     required
                     value={formData.subject}
                     onChange={handleChange}
-                    className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all bg-white"
+                    className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all bg-white"
                   >
                     <option value="">Select a topic</option>
                     <option>General Inquiry</option>
@@ -153,7 +152,7 @@ export default function ContactPage() {
                   required
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all resize-none"
+                  className="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all resize-none"
                   placeholder="Tell us how we can help you..."
                 />
               </div>
@@ -161,7 +160,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-blue-900 font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -196,7 +195,7 @@ export default function ContactPage() {
             </div>
 
             {/* Office Hours */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-8 shadow-lg">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 shadow-lg">
               <div className="flex items-start gap-4">
                 <div className="text-4xl">🕒</div>
                 <div>
@@ -212,7 +211,7 @@ export default function ContactPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Sunday:</span>
-                      <span className="font-semibold text-amber-600">Closed (Open for events)</span>
+                      <span className="font-semibold text-yellow-600">Closed (Open for events)</span>
                     </div>
                   </div>
                 </div>
@@ -224,31 +223,31 @@ export default function ContactPage() {
               <h3 className="text-xl font-bold text-gray-800 mb-4">📍 Our Location</h3>
               <div className="space-y-3 text-gray-600">
                 <p className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>123 Unity Avenue, Suite 200<br />Los Angeles, CA 90012</span>
+                  <span>Sky Beach, San Diego, California</span>
                 </p>
                 <p className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <span>+1 (555) 678-2345</span>
                 </p>
                 <p className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <span>hello@khorshidcommunity.org</span>
+                  <span>info@khorshidcommunity.org</span>
                 </p>
               </div>
             </div>
 
             {/* Social Media Links */}
-            <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-8 text-white">
+            <div className="bg-gradient-to-r from-blue-900 to-blue-950 rounded-3xl p-8 text-white">
               <h3 className="text-xl font-bold mb-4">🌐 Connect With Us</h3>
-              <p className="text-gray-300 mb-4">Follow us on social media for updates, events, and community highlights.</p>
+              <p className="text-blue-200 mb-4">Follow us on social media for updates, events, and community highlights.</p>
               <div className="flex gap-4">
                 {[
                   { name: "Instagram", icon: "📷", color: "hover:bg-pink-600" },
@@ -269,9 +268,9 @@ export default function ContactPage() {
         {/* FAQ Section */}
         <div className="mt-20">
           <div className="text-center mb-12">
-            <span className="text-amber-600 font-semibold tracking-wide uppercase text-sm">Quick Answers</span>
+            <span className="text-yellow-600 font-semibold tracking-wide uppercase text-sm">Quick Answers</span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Frequently Asked Questions</h2>
-            <div className="w-24 h-1 bg-amber-500 mx-auto rounded-full mt-4"></div>
+            <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full mt-4"></div>
           </div>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
@@ -292,7 +291,7 @@ export default function ContactPage() {
         <div className="mt-12 bg-gradient-to-r from-red-50 to-orange-50 rounded-2xl p-6 text-center border border-red-100">
           <p className="text-gray-700">
             <span className="font-bold text-red-600">⚠️ Emergency or crisis support?</span> Call our 24/7 helpline at 
-            <a href="tel:+18005551234" className="text-amber-700 font-bold ml-1">1-800-555-1234</a>
+            <a href="tel:+18005551234" className="text-yellow-600 font-bold ml-1">1-800-555-1234</a>
           </p>
         </div>
       </div>

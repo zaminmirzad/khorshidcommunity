@@ -1,4 +1,4 @@
-// app/gallery/page.tsx - Modern Professional Gallery with Categories & Lightbox
+// app/gallery/page.tsx - Navy Blue & Gold Theme
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -67,13 +67,13 @@ export default function GalleryPage() {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[40vh] min-h-[350px] bg-gradient-to-r from-amber-900 via-orange-800 to-amber-900 flex items-center justify-center text-white overflow-hidden">
+      <div className="relative h-[40vh] min-h-[350px] bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 flex items-center justify-center text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1511795409674-ef06e2d3b66c?q=80&w=2070')] bg-cover bg-center mix-blend-overlay" />
+        <div className="absolute inset-0 bg-[url('/images/gallery-hero.jpg')] bg-cover bg-center mix-blend-overlay" />
         <div className="relative z-10 text-center px-6">
           <span className="inline-block px-4 py-1.5 mb-4 text-sm font-semibold bg-white/20 backdrop-blur-sm rounded-full">Our Memories</span>
           <h1 className="text-5xl md:text-6xl font-bold mb-4">Photo Gallery</h1>
-          <p className="text-xl max-w-2xl mx-auto text-amber-100">Capturing the vibrant spirit, culture, and unity of KhorshidCommunity</p>
+          <p className="text-xl max-w-2xl mx-auto text-blue-100">Capturing the vibrant spirit, culture, and unity of KhorshidCommunity</p>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export default function GalleryPage() {
           ].map((stat, idx) => (
             <div key={idx} className="bg-white rounded-2xl p-6 text-center shadow-md hover:shadow-xl transition-all">
               <div className="text-4xl mb-2">{stat.icon}</div>
-              <div className="text-2xl md:text-3xl font-bold text-amber-600">{stat.number}</div>
+              <div className="text-2xl md:text-3xl font-bold text-yellow-600">{stat.number}</div>
               <div className="text-gray-600 text-sm">{stat.label}</div>
             </div>
           ))}
@@ -104,14 +104,14 @@ export default function GalleryPage() {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
                   selectedCategory === category.id
-                    ? 'bg-amber-600 text-white shadow-lg transform scale-105'
-                    : 'bg-white text-gray-700 hover:bg-amber-50 hover:shadow-md'
+                    ? 'bg-yellow-500 text-blue-900 shadow-lg transform scale-105'
+                    : 'bg-white text-gray-700 hover:bg-yellow-50 hover:shadow-md'
                 }`}
               >
                 <span>{category.icon}</span>
                 <span>{category.name}</span>
                 {selectedCategory === category.id && (
-                  <span className="bg-white/30 rounded-full w-5 h-5 flex items-center justify-center text-xs">✓</span>
+                  <span className="bg-blue-900/30 rounded-full w-5 h-5 flex items-center justify-center text-xs">✓</span>
                 )}
               </button>
             ))}
@@ -139,7 +139,7 @@ export default function GalleryPage() {
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                   <h3 className="text-white text-xl font-bold mb-1">{image.title}</h3>
-                  <p className="text-amber-200 text-sm flex items-center gap-2">
+                  <p className="text-yellow-300 text-sm flex items-center gap-2">
                     <span>📍 {image.location}</span>
                     <span>•</span>
                     <span>📅 {image.date}</span>
@@ -147,13 +147,13 @@ export default function GalleryPage() {
                 </div>
 
                 {/* Category Badge */}
-                <div className="absolute top-4 left-4 bg-amber-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold">
+                <div className="absolute top-4 left-4 bg-yellow-500/90 backdrop-blur-sm text-blue-900 px-3 py-1 rounded-full text-xs font-semibold">
                   {categories.find(c => c.id === image.category)?.name}
                 </div>
 
                 {/* Zoom Icon */}
                 <div className="absolute top-4 right-4 bg-white/90 rounded-full w-10 h-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-100">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                   </svg>
                 </div>
@@ -173,7 +173,7 @@ export default function GalleryPage() {
 
         {/* Load More Button */}
         <div className="text-center mt-12">
-          <button className="inline-flex items-center gap-2 px-8 py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-all shadow-lg">
+          <button className="inline-flex items-center gap-2 px-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold rounded-xl transition-all shadow-lg">
             Load More Memories
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -184,31 +184,31 @@ export default function GalleryPage() {
         {/* Video Section */}
         <div className="mt-20">
           <div className="text-center mb-12">
-            <span className="text-amber-600 font-semibold tracking-wide uppercase text-sm">Watch</span>
+            <span className="text-yellow-600 font-semibold tracking-wide uppercase text-sm">Watch</span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Event Highlights</h2>
-            <div className="w-24 h-1 bg-amber-500 mx-auto rounded-full mt-4"></div>
+            <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full mt-4"></div>
             <p className="text-gray-600 mt-4">Relive our most memorable moments through video</p>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="relative rounded-2xl overflow-hidden shadow-xl group">
-              <div className="aspect-video bg-gray-900 flex items-center justify-center">
+              <div className="aspect-video bg-gradient-to-br from-blue-900 to-blue-950 flex items-center justify-center">
                 <div className="text-center text-white">
-                  <div className="w-20 h-20 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform cursor-pointer">
+                  <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform cursor-pointer">
                     <div className="w-0 h-0 border-t-8 border-t-transparent border-l-14 border-l-white border-b-8 border-b-transparent ml-1"></div>
                   </div>
                   <p className="font-semibold">Nowruz Festival 2024 Highlights</p>
-                  <p className="text-sm text-gray-300">Watch the celebration</p>
+                  <p className="text-sm text-blue-200">Watch the celebration</p>
                 </div>
               </div>
             </div>
             <div className="relative rounded-2xl overflow-hidden shadow-xl group">
-              <div className="aspect-video bg-gray-800 flex items-center justify-center">
+              <div className="aspect-video bg-gradient-to-br from-blue-800 to-blue-950 flex items-center justify-center">
                 <div className="text-center text-white">
-                  <div className="w-20 h-20 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform cursor-pointer">
+                  <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform cursor-pointer">
                     <div className="w-0 h-0 border-t-8 border-t-transparent border-l-14 border-l-white border-b-8 border-b-transparent ml-1"></div>
                   </div>
                   <p className="font-semibold">Community Volunteer Day</p>
-                  <p className="text-sm text-gray-300">Making a difference together</p>
+                  <p className="text-sm text-blue-200">Making a difference together</p>
                 </div>
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function GalleryPage() {
         </div>
 
         {/* Share Your Photos CTA */}
-        <div className="mt-20 bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-12 text-center">
+        <div className="mt-20 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-12 text-center">
           <div className="text-5xl mb-4">📤</div>
           <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">Share Your Memories</h3>
           <p className="text-gray-600 max-w-2xl mx-auto mb-6">
@@ -224,10 +224,10 @@ export default function GalleryPage() {
             Tag us on social media or send us your favorite moments.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-all">
+            <button className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold rounded-xl transition-all">
               Upload Your Photos
             </button>
-            <button className="px-6 py-3 bg-white hover:bg-gray-50 text-amber-600 font-semibold rounded-xl transition-all border border-amber-200">
+            <button className="px-6 py-3 bg-white hover:bg-gray-50 text-yellow-600 font-semibold rounded-xl transition-all border border-yellow-200">
               Use #KhorshidCommunity
             </button>
           </div>
