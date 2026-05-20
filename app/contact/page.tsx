@@ -1,4 +1,4 @@
-// app/contact/page.tsx - Navy Blue & Gold Theme
+// app/contact/page.tsx - Navy Blue & Gold Theme with Email Functionality
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -13,16 +13,36 @@ export default function ContactPage() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
-    setLoading(false);
-    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    setTimeout(() => setSubmitted(false), 5000);
+    setError('');
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+        setTimeout(() => setSubmitted(false), 5000);
+      } else {
+        setError(data.error || 'Something went wrong. Please try again.');
+      }
+    } catch (err) {
+      setError('Failed to send message. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -72,12 +92,24 @@ export default function ContactPage() {
             </div>
 
             {submitted && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl animate-pulse">
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="text-2xl">✅</div>
                   <div>
                     <p className="font-semibold text-green-800">Message Sent Successfully!</p>
                     <p className="text-green-600 text-sm">Thank you for reaching out. We'll respond shortly.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl">❌</div>
+                  <div>
+                    <p className="font-semibold text-red-800">Error!</p>
+                    <p className="text-red-600 text-sm">{error}</p>
                   </div>
                 </div>
               </div>
