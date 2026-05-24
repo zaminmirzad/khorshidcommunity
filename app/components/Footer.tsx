@@ -94,7 +94,7 @@ export default function Footer() {
             <h4 style={{ color: 'white', fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>Contact Us</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
               <li style={{ marginBottom: '12px' }}>📍 Sky Beach, San Diego, CA</li>
-              <li style={{ marginBottom: '12px' }}>📞 +1 (555) 678-2345</li>
+              <li style={{ marginBottom: '12px' }}>📞 +1 (619) 882-7406</li>
               <li style={{ marginBottom: '12px' }}>✉️ Info@khorshidcommunity.org</li>
             </ul>
           </div>

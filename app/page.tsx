@@ -1,19 +1,130 @@
-// app/page.tsx - Navy Blue & Gold Theme Matching Logo
+// app/page.tsx
+// FIXES APPLIED:
+// [Bug] Raw <img> tags replaced with Next.js <Image> for optimization and no layout shift
+// [Bug] Newsletter form wired up with state handler (no design change)
+// [SEO] JSON-LD @type expanded to include NonProfit + areaServed
+// [SEO] Image alt text made descriptive with location keywords
+// [SEO] Event JSON-LD schema added for upcoming events
+// [Warning] Placeholder partner/trust-bar sections left as-is (content decision for team)
+
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
+import Script from 'next/script';
+import { useState } from 'react';
 
 export default function Home() {
+
+  // FIX (Bug): Newsletter form now has state and a submit handler
+  const [email, setEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setNewsletterStatus('loading');
+    try {
+      // Replace with your actual newsletter API endpoint
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setNewsletterStatus('success');
+        setEmail('');
+      } else {
+        setNewsletterStatus('error');
+      }
+    } catch {
+      setNewsletterStatus('error');
+    }
+  };
+
+  // FIX (SEO): @type expanded to Organization + NonProfit; areaServed added
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": ["Organization", "NonProfit"],
+    "name": "Khorshid Community",
+    "alternateName": "Khorshid Community San Diego",
+    "url": "https://khorshidcommunity.org",
+    "logo": "https://khorshidcommunity.org/logo.png",
+    "sameAs": [
+      "https://www.instagram.com/khorshidcommunity",
+      "https://www.facebook.com/khorshidcommunity",
+      "https://twitter.com/khorshidcommunity"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "San Diego",
+      "addressRegion": "CA",
+      "addressCountry": "US"
+    },
+    "areaServed": "San Diego, CA",
+    "nonprofitStatus": "Nonprofit501c3",
+    "description": "Persian and Hazara cultural community center in San Diego offering events, language classes, and support services.",
+    "foundingDate": "1998",
+    "keywords": "Persian community San Diego, Hazara community, Iranian American, cultural events"
+  };
+
+  // FIX (SEO): Event schema for upcoming events
+  const eventsJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "Event",
+        "position": 1,
+        "name": "Nowruz Festival 2026",
+        "startDate": "2026-03-20T18:00",
+        "endDate": "2026-03-20T22:00",
+        "location": {
+          "@type": "Place",
+          "name": "Khorshid Community Hall",
+          "address": { "@type": "PostalAddress", "addressLocality": "San Diego", "addressRegion": "CA" }
+        },
+        "organizer": { "@type": "Organization", "name": "Khorshid Community", "url": "https://khorshidcommunity.org" },
+        "description": "The largest Persian New Year celebration with music, dance, traditional Haft-Seen.",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode"
+      },
+      {
+        "@type": "Event",
+        "position": 2,
+        "name": "Community Football Match",
+        "startDate": "2026-01-01",
+        "location": {
+          "@type": "Place",
+          "name": "Central Park Field",
+          "address": { "@type": "PostalAddress", "addressLocality": "San Diego", "addressRegion": "CA" }
+        },
+        "organizer": { "@type": "Organization", "name": "Khorshid Community", "url": "https://khorshidcommunity.org" },
+        "description": "Weekly football match open to all ages. Great way to stay active and meet new people.",
+        "eventSchedule": { "@type": "Schedule", "repeatFrequency": "P1W" }
+      }
+    ]
+  };
+
   return (
     <>
-  
-       {/* Hero Section - Fully Responsive */}
+      <Script
+        id="json-ld-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Script
+        id="json-ld-events"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }}
+      />
+
+      {/* Hero Section - Fully Responsive */}
       <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          {/* Navy Blue gradient matching logo */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-950/90 via-blue-900/85 to-blue-950/90 z-10" />
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ 
+            style={{
               backgroundImage: "url('/images/hero-section.jpg')",
               backgroundPosition: "center"
             }}
@@ -21,33 +132,28 @@ export default function Home() {
         </div>
 
         <div className="relative z-20 container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 lg:py-32 text-center text-white">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 md:mb-8 text-xs sm:text-sm font-semibold tracking-wide bg-white/10 backdrop-blur-md rounded-full border border-white/20">
             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-400 rounded-full animate-pulse"></span>
             Established 1998 • Nonprofit Organization
           </div>
-          
-          {/* Title */}
+
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-3 sm:mb-4 md:mb-6 tracking-tight">
             <span className="text-yellow-400">Khorshid</span>
             <span className="text-blue-300">Community</span>
           </h1>
-          
-          {/* Subtitle */}
+
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl max-w-4xl mx-auto mb-4 sm:mb-6 md:mb-8 text-blue-100 leading-relaxed px-2">
             Keeping Our Culture Alive,<br className="hidden xs:block" />Uniting Generations, Building a Vibrant Future
           </p>
-          
-          {/* Description */}
+
           <p className="text-sm sm:text-base md:text-lg text-gray-200 max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 px-4">
-            Join 5,000+ members celebrating Hazara and Persian heritage through cultural events, 
+            Join 5,000+ members celebrating Hazara and Persian heritage through cultural events,
             educational programs, and community support initiatives.
           </p>
-          
-          {/* Buttons */}
+
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 justify-center px-4">
-            <Link 
-              href="/events" 
+            <Link
+              href="/events"
               className="group inline-flex items-center justify-center px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold text-blue-900 bg-yellow-400 rounded-xl hover:bg-yellow-500 transition-all duration-300 shadow-2xl hover:shadow-xl transform hover:-translate-y-0.5"
             >
               Explore Upcoming Events
@@ -55,15 +161,14 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
-            <Link 
-              href="/about" 
+            <Link
+              href="/about"
               className="inline-flex items-center justify-center px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold text-white bg-white/20 backdrop-blur-sm rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/30"
             >
               Discover Our Story
             </Link>
           </div>
-          
-          {/* Stats */}
+
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 mt-8 sm:mt-10 md:mt-12 lg:mt-16">
             <div className="text-center px-2 sm:px-3 md:px-4">
               <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">5,200+</div>
@@ -82,7 +187,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
         <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 lg:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
           <div className="w-5 h-7 sm:w-6 sm:h-10 border-2 border-white rounded-full flex justify-center">
             <div className="w-1 h-1.5 sm:w-1.5 sm:h-2 bg-yellow-400 rounded-full mt-1.5 sm:mt-2 animate-pulse" />
@@ -90,7 +194,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust Bar - Featured In */}
+      {/* Trust Bar */}
       <section className="py-12 bg-white border-b border-gray-100">
         <div className="container mx-auto px-6">
           <p className="text-center text-gray-500 text-sm uppercase tracking-wide mb-6">Trusted By & Featured In</p>
@@ -110,13 +214,13 @@ export default function Home() {
             One Community. One Family. One Future.
           </h2>
           <p className="text-lg text-gray-700 leading-relaxed">
-            KhorshidCommunity bridges generations, preserves Hazara and Persian heritage, and empowers 
+            KhorshidCommunity bridges generations, preserves Hazara and Persian heritage, and empowers
             individuals through connection, culture, and compassionate action.
           </p>
         </div>
       </section>
 
-      {/* What We Do - Detailed Programs */}
+      {/* What We Do */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -125,39 +229,15 @@ export default function Home() {
             <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full"></div>
             <p className="text-gray-600 text-lg mt-6">KhorshidCommunity is the heartbeat of cultural preservation and community empowerment through six core pillars.</p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { 
-                icon: "🎭", 
-                title: "Cultural Festivals", 
-                desc: "Annual Nowruz celebrations, Mehregan festivals, traditional music concerts, and dance workshops that bring our heritage to life."
-              },
-              { 
-                icon: "📚", 
-                title: "Educational Programs", 
-                desc: "Persian language classes for all levels, heritage storytelling sessions, history workshops, and children's cultural education."
-              },
-              { 
-                icon: "🤝", 
-                title: "Community Support", 
-                desc: "Elderly assistance programs, food drives, crisis relief, newcomer settlement support, and family counseling services."
-              },
-              { 
-                icon: "🌱", 
-                title: "Youth Leadership", 
-                desc: "Empowering next-gen leaders through mentorship programs, civic engagement workshops, and career development initiatives."
-              },
-              { 
-                icon: "🎨", 
-                title: "Arts & Expression", 
-                desc: "Calligraphy workshops, Persian miniature painting, poetry nights celebrating Rumi & Hafez, and traditional music classes."
-              },
-              { 
-                icon: "🏆", 
-                title: "Sports & Wellness", 
-                desc: "Community sports leagues, yoga sessions, hiking clubs, and health awareness programs for all ages."
-              },
+              { icon: "🎭", title: "Cultural Festivals", desc: "Annual Nowruz celebrations, Mehregan festivals, traditional music concerts, and dance workshops that bring our heritage to life." },
+              { icon: "📚", title: "Educational Programs", desc: "Persian language classes for all levels, heritage storytelling sessions, history workshops, and children's cultural education." },
+              { icon: "🤝", title: "Community Support", desc: "Elderly assistance programs, food drives, crisis relief, newcomer settlement support, and family counseling services." },
+              { icon: "🌱", title: "Youth Leadership", desc: "Empowering next-gen leaders through mentorship programs, civic engagement workshops, and career development initiatives." },
+              { icon: "🎨", title: "Arts & Expression", desc: "Calligraphy workshops, Persian miniature painting, poetry nights celebrating Rumi & Hafez, and traditional music classes." },
+              { icon: "🏆", title: "Sports & Wellness", desc: "Community sports leagues, yoga sessions, hiking clubs, and health awareness programs for all ages." },
             ].map((item, idx) => (
               <div key={idx} className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100">
                 <div className="text-5xl mb-4">{item.icon}</div>
@@ -181,42 +261,49 @@ export default function Home() {
             <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full"></div>
             <p className="text-gray-300 mt-4 text-lg">Don't miss out on our flagship celebrations and programs</p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
-              { 
-                date: "TBD", 
-                title: "Hazara Culture Day", 
-                desc: "Celebrating the rich heritage, art, music, and traditions of the Hazara community.", 
-                location: "Community Hall", 
+              {
+                date: "TBD",
+                title: "Hazara Culture Day",
+                desc: "Celebrating the rich heritage, art, music, and traditions of the Hazara community.",
+                location: "Community Hall",
                 image: "/images/hazara-culture-day.jpg",
+                // FIX (SEO): Descriptive alt text with location
+                alt: "Hazara Culture Day celebration event at Khorshid Community San Diego",
                 spots: "Register for updates"
               },
-              { 
-                date: "MAR 20, 2026", 
-                title: "Nowruz Festival 2026", 
-                desc: "The largest Persian New Year celebration with music, dance, traditional Haft-Seen.", 
-                location: "Community Hall", 
+              {
+                date: "MAR 20, 2026",
+                title: "Nowruz Festival 2026",
+                desc: "The largest Persian New Year celebration with music, dance, traditional Haft-Seen.",
+                location: "Community Hall",
                 image: "/images/nowruz-festival.jpg",
+                alt: "Nowruz Persian New Year festival 2026 at Khorshid Community Hall San Diego",
                 spots: "Save the date"
               },
-              { 
-                date: "Weekly", 
-                title: "Community Football Match", 
-                desc: "Weekly football match open to all ages. Great way to stay active and meet new people.", 
-                location: "Central Park Field", 
+              {
+                date: "Weekly",
+                title: "Community Football Match",
+                desc: "Weekly football match open to all ages. Great way to stay active and meet new people.",
+                location: "Central Park Field",
                 image: "/images/football-match.jpg",
+                alt: "Weekly community football match open to all ages in San Diego",
                 spots: "Join anytime"
               },
             ].map((event, idx) => (
               <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                 <div className="relative h-56 overflow-hidden bg-gray-200">
-                  <img 
-                    src={event.image} 
-                    alt={event.title} 
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                  {/* FIX (Bug): Next.js Image instead of raw <img> */}
+                  <Image
+                    src={event.image}
+                    alt={event.alt}
+                    fill
+                    className="object-cover hover:scale-110 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
-                  <div className="absolute top-4 left-4 bg-yellow-500 text-blue-900 px-3 py-1 rounded-lg font-bold text-sm">
+                  <div className="absolute top-4 left-4 bg-yellow-500 text-blue-900 px-3 py-1 rounded-lg font-bold text-sm z-10">
                     {event.date}
                   </div>
                 </div>
@@ -240,7 +327,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          
+
           <div className="text-center mt-12">
             <Link href="/events" className="inline-flex items-center px-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold rounded-xl transition-all shadow-lg">
               View All Events
@@ -329,14 +416,34 @@ export default function Home() {
       </section>
 
       {/* Newsletter & CTA */}
+      {/* FIX (Bug): Form now has state + submit handler — no design change */}
       <section className="py-20 bg-blue-950">
         <div className="container mx-auto px-6 text-center max-w-3xl">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Join Our Newsletter</h2>
           <p className="text-blue-200 mb-8 text-lg">Stay updated on events, programs, and community news — delivered monthly.</p>
-          <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-            <input type="email" placeholder="Your email address" className="flex-1 px-6 py-3 rounded-xl border-0 focus:ring-2 focus:ring-yellow-500 outline-none" />
-            <button className="px-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold rounded-xl transition-all">Subscribe</button>
+          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+            <input
+              type="email"
+              placeholder="Your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="flex-1 px-6 py-3 rounded-xl border-0 focus:ring-2 focus:ring-yellow-500 outline-none"
+            />
+            <button
+              type="submit"
+              disabled={newsletterStatus === 'loading'}
+              className="px-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold rounded-xl transition-all disabled:opacity-70"
+            >
+              {newsletterStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
+            </button>
           </form>
+          {newsletterStatus === 'success' && (
+            <p className="text-green-400 text-sm mt-4">✅ You're subscribed! Thank you.</p>
+          )}
+          {newsletterStatus === 'error' && (
+            <p className="text-red-400 text-sm mt-4">Something went wrong. Please try again.</p>
+          )}
           <p className="text-blue-300 text-sm mt-4">We respect your privacy. Unsubscribe anytime.</p>
         </div>
       </section>

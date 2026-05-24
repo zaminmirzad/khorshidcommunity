@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://khorshidcommunity.org/sitemap.xml

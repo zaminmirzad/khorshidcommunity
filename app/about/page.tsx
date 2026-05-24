@@ -1,5 +1,27 @@
-// app/about/page.tsx - Navy Blue & Gold Theme
+// app/about/page.tsx
+// FIXES APPLIED:
+// [SEO] Added page-level metadata (title + description) — was missing entirely
+// [SEO] Descriptive alt text on all team member images
+// [Bug] Timeline founding year aligned to 1998 to match JSON-LD and hero text
+// [Bug] Raw <img> replaced with Next.js <Image>
+
 import Link from 'next/link';
+import Image from 'next/image';
+
+// FIX (SEO): Page-level metadata — previously this page had none
+export const metadata = {
+  title: "About Us | Khorshid Community — Persian & Hazara Cultural Center San Diego",
+  description: "Learn about Khorshid Community, founded in 1998. Our mission, vision, core values, leadership team, and strategic goals for the Persian and Hazara community in San Diego.",
+  alternates: {
+    canonical: "https://khorshidcommunity.org/about",
+  },
+  openGraph: {
+    title: "About Khorshid Community | Persian & Hazara Cultural Center San Diego",
+    description: "Founded in 1998, Khorshid Community unites 5,000+ members celebrating Hazara and Persian heritage in San Diego.",
+    url: "https://khorshidcommunity.org/about",
+    images: [{ url: "/images/about-hero.jpg", width: 1200, height: 630, alt: "Khorshid Community about page — Persian and Hazara cultural center San Diego" }],
+  },
+};
 
 export default function AboutPage() {
   return (
@@ -16,23 +38,22 @@ export default function AboutPage() {
       </div>
 
       <div className="container mx-auto px-6 py-20 max-w-6xl">
-        
+
         {/* Who We Are */}
         <div className="text-center mb-16">
           <span className="text-yellow-600 font-semibold tracking-wide uppercase text-sm">Our Story</span>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-2 mb-6">Who We Are</h2>
           <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full mb-8"></div>
           <p className="text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
-            KhorshidCommunity is a vibrant, nonprofit organization dedicated to uniting and empowering 
-            the Hazara and Persian-speaking community and culture enthusiasts. Founded in 1998 by passionate volunteers, 
-            we've grown into a thriving hub of cultural celebration, educational programs, and social support 
+            KhorshidCommunity is a vibrant, nonprofit organization dedicated to uniting and empowering
+            the Hazara and Persian-speaking community and culture enthusiasts. Founded in 1998 by passionate volunteers,
+            we've grown into a thriving hub of cultural celebration, educational programs, and social support
             — serving over 5,000 community members annually.
           </p>
         </div>
 
         {/* Mission & Vision Grid */}
         <div className="grid md:grid-cols-2 gap-8 mb-20">
-          {/* Mission Card */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 shadow-lg border border-blue-100">
             <div className="w-16 h-16 bg-blue-700 rounded-2xl flex items-center justify-center mb-5">
               <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,13 +62,12 @@ export default function AboutPage() {
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-3">Our Mission</h3>
             <p className="text-gray-700 leading-relaxed">
-              To unite, empower, and celebrate the Khorshid community by preserving cultural traditions, 
-              providing educational opportunities, and fostering meaningful social connections across generations. 
+              To unite, empower, and celebrate the Khorshid community by preserving cultural traditions,
+              providing educational opportunities, and fostering meaningful social connections across generations.
               We strive to create a home away from home where every member feels valued, heard, and inspired.
             </p>
           </div>
 
-          {/* Vision Card */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 shadow-lg border border-blue-100">
             <div className="w-16 h-16 bg-blue-700 rounded-2xl flex items-center justify-center mb-5">
               <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,14 +77,14 @@ export default function AboutPage() {
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-3">Our Vision</h3>
             <p className="text-gray-700 leading-relaxed">
-              A world where the rich tapestry of Hazara and Persian culture thrives for generations to come — where 
-              every individual, regardless of age or background, finds belonging, purpose, and an opportunity 
+              A world where the rich tapestry of Hazara and Persian culture thrives for generations to come — where
+              every individual, regardless of age or background, finds belonging, purpose, and an opportunity
               to contribute to a vibrant, interconnected community.
             </p>
           </div>
         </div>
 
-        {/* Core Values Section */}
+        {/* Core Values */}
         <div className="mb-20">
           <div className="text-center mb-12">
             <span className="text-yellow-600 font-semibold tracking-wide uppercase text-sm">What We Stand For</span>
@@ -73,36 +93,12 @@ export default function AboutPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { 
-                icon: "🤝", 
-                title: "Inclusivity", 
-                desc: "Everyone is welcome regardless of background, religion, or generation. We celebrate diversity and create safe spaces for all voices.",
-              },
-              { 
-                icon: "🎭", 
-                title: "Cultural Pride", 
-                desc: "We honor our heritage with joy and authenticity, preserving traditions while embracing evolution and growth.",
-              },
-              { 
-                icon: "💪", 
-                title: "Mutual Support", 
-                desc: "We lift each other through challenges and celebrate successes together, embodying true community spirit.",
-              },
-              { 
-                icon: "📚", 
-                title: "Education First", 
-                desc: "Knowledge is power. We invest in learning opportunities for all ages — from language classes to leadership training.",
-              },
-              { 
-                icon: "🌟", 
-                title: "Excellence", 
-                desc: "We strive for the highest quality in every program, event, and service we offer to our community.",
-              },
-              { 
-                icon: "🌱", 
-                title: "Sustainability", 
-                desc: "Building lasting impact through responsible practices and empowering future generations to carry our mission forward.",
-              },
+              { icon: "🤝", title: "Inclusivity", desc: "Everyone is welcome regardless of background, religion, or generation. We celebrate diversity and create safe spaces for all voices." },
+              { icon: "🎭", title: "Cultural Pride", desc: "We honor our heritage with joy and authenticity, preserving traditions while embracing evolution and growth." },
+              { icon: "💪", title: "Mutual Support", desc: "We lift each other through challenges and celebrate successes together, embodying true community spirit." },
+              { icon: "📚", title: "Education First", desc: "Knowledge is power. We invest in learning opportunities for all ages — from language classes to leadership training." },
+              { icon: "🌟", title: "Excellence", desc: "We strive for the highest quality in every program, event, and service we offer to our community." },
+              { icon: "🌱", title: "Sustainability", desc: "Building lasting impact through responsible practices and empowering future generations to carry our mission forward." },
             ].map((value, idx) => (
               <div key={idx} className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="text-5xl mb-4">{value.icon}</div>
@@ -152,7 +148,9 @@ export default function AboutPage() {
             <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-yellow-200 hidden md:block"></div>
             <div className="space-y-8">
               {[
-                { year: "2010", title: "Foundation", desc: "KhorshidCommunity founded by 5 families", side: "left" },
+                // FIX (Bug): Founding year corrected to 1998 — was "2010" which contradicts
+                // JSON-LD foundingDate, hero text, and about page copy all saying 1998
+                { year: "1998", title: "Foundation", desc: "KhorshidCommunity founded by passionate community volunteers", side: "left" },
                 { year: "2015", title: "Community Center Opens", desc: "First dedicated space for events and programs", side: "right" },
                 { year: "2019", title: "Youth Leadership Program", desc: "Launch of mentorship initiatives", side: "left" },
                 { year: "2021", title: "20th Anniversary Gala", desc: "Celebrated with 800+ community members", side: "right" },
@@ -181,89 +179,74 @@ export default function AboutPage() {
             <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full"></div>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">Dedicated volunteers and staff working tirelessly to serve our community</p>
           </div>
-          
-          {/* President - Mahdi Soroush - Top centered */}
+
+          {/* President */}
           <div className="max-w-3xl mx-auto mb-16 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 shadow-lg">
             <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="w-36 h-36 rounded-full overflow-hidden bg-gradient-to-br from-blue-700 to-blue-800 ring-4 ring-yellow-400 shrink-0 flex items-center justify-center">
-                <picture>
-                  <source srcSet="/images/mahdi-soroush.jpg" type="image/jpeg" />
-                  <img 
-                    src="/images/mahdi-soroush.jpg" 
-                    alt="Mahdi Soroush" 
-                    className="w-full h-full object-cover"
-                  />
-                </picture>
+              <div className="w-36 h-36 rounded-full overflow-hidden bg-gradient-to-br from-blue-700 to-blue-800 ring-4 ring-yellow-400 shrink-0 relative">
+                {/* FIX (Bug): Next.js Image instead of raw <img>; descriptive alt text */}
+                <Image
+                  src="/images/mahdi-soroush.jpg"
+                  alt="Mahdi Soroush, President of Khorshid Community San Diego"
+                  fill
+                  className="object-cover"
+                  sizes="144px"
+                />
               </div>
               <div className="text-center md:text-left flex-1">
                 <h3 className="text-2xl font-bold text-gray-800">Mahdi Soroush</h3>
                 <p className="text-yellow-600 font-semibold text-lg mb-3">President</p>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  Mahdi Soroush is the President of the Khorshid nonprofit community and holds a Master's degree in 
-                  Computer Science and Technology from Shanxi University. Fluent in English, Chinese, Persian, and Pashto, 
-                  he is dedicated to community development, cultural engagement, youth empowerment, and strengthening 
+                  Mahdi Soroush is the President of the Khorshid nonprofit community and holds a Master's degree in
+                  Computer Science and Technology from Shanxi University. Fluent in English, Chinese, Persian, and Pashto,
+                  he is dedicated to community development, cultural engagement, youth empowerment, and strengthening
                   connections within diverse communities through leadership and service.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Three leaders in a row */}
+          {/* Three leaders */}
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Jafar Rezaei - Secretary */}
-            <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 text-center group">
-              <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 ring-4 ring-yellow-200 group-hover:ring-yellow-400 transition-all mb-4 flex items-center justify-center">
-                <img 
-                  src="/images/jafar-rezaei.jpg" 
-                  alt="Jafar Rezaei" 
-                  className="w-full h-full object-cover"
-                />
+            {[
+              {
+                src: "/images/jafar-rezaei.jpg",
+                // FIX (SEO): Descriptive alt text with role and org
+                alt: "Jafar Rezaei, Secretary of Khorshid Community San Diego",
+                name: "Jafar Rezaei",
+                role: "Secretary",
+                bio: "Jafar Rezaei is an Electrical Engineering graduate and currently serves as the Secretary of the Khorshid Community. With experience in engineering, project coordination, and community development, he contributes to strengthening organizational structure, community engagement, and long-term initiatives supporting the Afghan and Hazara community.",
+              },
+              {
+                src: "/images/mortaza-yaqobi.jpg",
+                alt: "Mortaza Yaqobi, Vice President and Cultural Committee Chair of Khorshid Community San Diego",
+                name: "Mortaza Yaqobi",
+                role: "Vice President & Cultural Committee Chair",
+                bio: "Bachelor's degree in Political Science with a focus on International Relations. Experience in entrepreneurship and business management in Afghanistan, including trade, tourism, education, and cargo logistics. Committed to preserving Hazara identity, promoting cultural initiatives, empowering youth, and supporting constructive cultural integration within America's diverse society.",
+              },
+              {
+                src: "/images/ihsan-latif.jpg",
+                alt: "Ihsan Latif, Chief Financial Officer of Khorshid Community San Diego",
+                name: "Ihsan Latif",
+                role: "Chief Financial Officer",
+                bio: "Former student at San Diego State University, currently serving as the Chief Financial Officer of the Khorshid Community. Brings over 8 years of experience in business management, team leadership, and business consulting. Focused on maintaining financial transparency, strengthening organizational operations, and supporting the long-term growth and stability of the community.",
+              },
+            ].map((member, idx) => (
+              <div key={idx} className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 text-center group">
+                <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 ring-4 ring-yellow-200 group-hover:ring-yellow-400 transition-all mb-4 relative">
+                  <Image
+                    src={member.src}
+                    alt={member.alt}
+                    fill
+                    className="object-cover"
+                    sizes="128px"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">{member.name}</h3>
+                <p className="text-yellow-600 font-semibold text-sm mb-3">{member.role}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">{member.bio}</p>
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Jafar Rezaei</h3>
-              <p className="text-yellow-600 font-semibold text-sm mb-3">Secretary</p>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Jafar Rezaei is an Electrical Engineering graduate and currently serves as the Secretary of the Khorshid Community. 
-                With experience in engineering, project coordination, and community development, he contributes to strengthening 
-                organizational structure, community engagement, and long-term initiatives supporting the Afghan and Hazara community.
-              </p>
-            </div>
-
-            {/* Mortaza Yaqobi - Vice President */}
-            <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 text-center group">
-              <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 ring-4 ring-yellow-200 group-hover:ring-yellow-400 transition-all mb-4 flex items-center justify-center">
-                <img 
-                  src="/images/mortaza-yaqobi.jpg" 
-                  alt="Mortaza Yaqobi" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800">Mortaza Yaqobi</h3>
-              <p className="text-yellow-600 font-semibold text-sm mb-3">Vice President & Cultural Committee Chair</p>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Bachelor's degree in Political Science with a focus on International Relations. Experience in entrepreneurship 
-                and business management in Afghanistan, including trade, tourism, education, and cargo logistics. Committed to 
-                preserving Hazara identity, promoting cultural initiatives, empowering youth, and supporting constructive 
-                cultural integration within America's diverse society.
-              </p>
-            </div>
-
-            {/* Ihsan Latif - CFO */}
-            <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 text-center group">
-              <div className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 ring-4 ring-yellow-200 group-hover:ring-yellow-400 transition-all mb-4 flex items-center justify-center">
-                <img 
-                  src="/images/ihsan-latif.jpg" 
-                  alt="Ihsan Latif" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800">Ihsan Latif</h3>
-              <p className="text-yellow-600 font-semibold text-sm mb-3">Chief Financial Officer</p>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Former student at San Diego State University, currently serving as the Chief Financial Officer of the Khorshid Community. 
-                Brings over 8 years of experience in business management, team leadership, and business consulting. Focused on maintaining 
-                financial transparency, strengthening organizational operations, and supporting the long-term growth and stability of the community.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
 
