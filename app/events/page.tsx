@@ -67,7 +67,7 @@ export default function EventsPage() {
       id: 4,
       date: "TBD",
       time: "TBD",
-      title: "Eid al-Adha Celebration",
+      title: "Nowruz Celebration",
       location: "Community Center",
       type: "Religious",
       image: "/images/eid-celebration.jpg",
