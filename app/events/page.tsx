@@ -30,27 +30,27 @@ export default function EventsPage() {
       id: 1,
       date: "TBD",
       time: "TBD",
-      title: "Hazara Culture Day",
+      title: "Hazara Culture Day 2025",
       location: "Khorshid Community Hall",
       type: "Cultural",
-      image: "/images/hazara-culture-day.jpg",
+      image: "/images/nowruz-festival.jpg",
       // FIX (SEO): Descriptive alt text
       alt: "Hazara Culture Day celebration featuring art, music and traditions at Khorshid Community San Diego",
       description: "Celebrating the rich heritage, art, music, and traditions of the Hazara community. A day of cultural exchange, traditional food, music performances, and unity.",
       schemaDate: null,
     },
-    {
+/*     {
       id: 2,
       date: "March 20, 2026",
       time: "6:00 PM - 10:00 PM",
-      title: "Nowruz Festival 2026",
+      title: "Nowruz Festiv 2025",
       location: "Khorshid Community Hall",
       type: "Cultural",
       image: "/images/nowruz-festival.jpg",
       alt: "Nowruz Persian New Year festival 2026 with Haft-Seen, music and dance at Khorshid Community Hall San Diego",
       description: "The largest Persian New Year celebration in the region with music, dance, traditional Haft-Seen table, and a festive dinner to welcome spring.",
       schemaDate: "2026-03-20T18:00",
-    },
+    }, */
     {
       id: 3,
       date: "TBD",
