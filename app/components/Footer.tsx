@@ -1,86 +1,44 @@
-// app/components/Footer.tsx - Navy Blue & Gold Theme
-'use client';
-
 import Link from 'next/link';
+import Image from 'next/image';
+import { NAV_LINKS } from '@/lib/nav';
+import { SITE_CONFIG, SOCIAL_LINKS } from '@/lib/constants';
 
 export default function Footer() {
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/events', label: 'Events' },
-    { href: '/about', label: 'About' },
-    { href: '/gallery', label: 'Gallery' },
-    { href: '/contact', label: 'Contact' },
-  ];
-
   return (
-    <footer style={{
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
-      color: '#9ca3af',
-      padding: '60px 24px 32px',
-      marginTop: '80px',
-    }}>
-      <div style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-      }}>
-        {/* Footer Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '40px',
-          marginBottom: '48px',
-        }}>
-          {/* Logo and About Section */}
+    <footer className="bg-gradient-to-br from-[#0f172a] to-[#1e1b4b] text-gray-400 px-4 sm:px-6 pt-14 pb-8 mt-20">
+      <div className="max-w-7xl mx-auto">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+          {/* Brand */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <img 
-                src="/images/logo.jpg" 
-                alt="KhorshidCommunity Logo" 
-                style={{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '12px',
-                  objectFit: 'cover',
-                }}
+            <div className="flex items-center gap-3 mb-4">
+              <Image
+                src="/images/logo.jpg"
+                alt="Khorshid Community logo"
+                width={50}
+                height={50}
+                className="rounded-xl object-cover"
               />
               <div>
-                <span style={{ 
-                  fontSize: '20px', 
-                  fontWeight: 'bold',
-                  color: '#fbbf24',
-                }}>
-                  Khorshid
-                </span>
-                <span style={{ 
-                  fontSize: '20px', 
-                  fontWeight: 'bold',
-                  color: 'white',
-                }}>
-                  Community
-                </span>
+                <span className="text-xl font-bold text-yellow-400">Khorshid</span>
+                <span className="text-xl font-bold text-white">Community</span>
               </div>
             </div>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#9ca3af' }}>
-              Uniting hearts, preserving heritage, and building a vibrant future together since 1998.
+            <p className="text-sm leading-relaxed">
+              Uniting hearts, preserving heritage, and building a vibrant future together since {SITE_CONFIG.foundingYear}.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 style={{ color: 'white', fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>Quick Links</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {navLinks.map((link) => (
-                <li key={link.href} style={{ marginBottom: '12px' }}>
-                  <Link 
-                    href={link.href} 
-                    style={{ 
-                      color: '#9ca3af', 
-                      textDecoration: 'none', 
-                      fontSize: '14px',
-                      transition: 'color 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#fbbf24'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = '#9ca3af'}
+            <h4 className="text-white text-base font-semibold mb-5">Quick Links</h4>
+            <ul className="space-y-3">
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm hover:text-yellow-400 transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
@@ -89,53 +47,52 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact */}
           <div>
-            <h4 style={{ color: 'white', fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>Contact Us</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
-              <li style={{ marginBottom: '12px' }}>📍 Sky Beach, San Diego, CA</li>
-              <li style={{ marginBottom: '12px' }}>📞 +1 (619) 882-7406</li>
-              <li style={{ marginBottom: '12px' }}>✉️ Info@khorshidcommunity.org</li>
+            <h4 className="text-white text-base font-semibold mb-5">Contact Us</h4>
+            <ul className="space-y-3 text-sm leading-relaxed">
+              <li>📍 {SITE_CONFIG.address}</li>
+              <li>
+                <a href={`tel:${SITE_CONFIG.phone.replace(/\D/g, '')}`} className="hover:text-yellow-400 transition-colors duration-200">
+                  📞 {SITE_CONFIG.phone}
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${SITE_CONFIG.email}`} className="hover:text-yellow-400 transition-colors duration-200">
+                  ✉️ {SITE_CONFIG.email}
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* Social Media & Hours */}
+          {/* Social + Hours */}
           <div>
-            <h4 style={{ color: 'white', fontSize: '16px', marginBottom: '20px', fontWeight: '600' }}>Follow Us</h4>
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-              {['📷', '📘', '▶️', '💼'].map((icon, idx) => (
-                <span 
-                  key={idx}
-                  style={{ 
-                    fontSize: '28px', 
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s ease',
-                    display: 'inline-block',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            <h4 className="text-white text-base font-semibold mb-5">Follow Us</h4>
+            <div className="flex gap-3 mb-6">
+              {SOCIAL_LINKS.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Follow Khorshid Community on ${social.name}`}
+                  className="text-2xl hover:scale-110 transition-transform duration-200 inline-block"
                 >
-                  {icon}
-                </span>
+                  {social.icon}
+                </a>
               ))}
             </div>
-            <h4 style={{ color: 'white', fontSize: '16px', marginBottom: '16px', fontWeight: '600' }}>Office Hours</h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '14px', lineHeight: '1.8' }}>
-              <li>Mon-Fri: 10AM - 6PM</li>
-              <li>Sat: 11AM - 4PM</li>
-              <li>Sun: Closed (Events only)</li>
+            <h4 className="text-white text-base font-semibold mb-3">Office Hours</h4>
+            <ul className="text-sm space-y-1">
+              <li>Mon–Fri: {SITE_CONFIG.officeHours.weekdays}</li>
+              <li>Sat: {SITE_CONFIG.officeHours.saturday}</li>
+              <li>Sun: {SITE_CONFIG.officeHours.sunday}</li>
             </ul>
           </div>
         </div>
 
-        {/* Copyright Bar */}
-        <div style={{
-          borderTop: '1px solid #334155',
-          paddingTop: '32px',
-          textAlign: 'center',
-          fontSize: '14px',
-        }}>
-          <p>© 2025 KhorshidCommunity. All rights reserved. | Built with ❤️ for the community</p>
+        <div className="border-t border-slate-700 pt-8 text-center text-sm">
+          <p>© {new Date().getFullYear()} KhorshidCommunity. All rights reserved. | Built with ❤️ for the community</p>
         </div>
       </div>
     </footer>

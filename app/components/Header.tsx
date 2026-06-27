@@ -1,238 +1,96 @@
-// app/components/Header.tsx - Navy Blue & Gold Theme
 'use client';
-
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { NAV_LINKS } from '@/lib/nav';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     handleScroll();
-    
-    window.addEventListener('resize', checkMobile);
-    window.addEventListener('scroll', handleScroll);
-    
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-      window.removeEventListener('scroll', handleScroll);
-    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/events', label: 'Events' },
-    { href: '/about', label: 'About' },
-    { href: '/gallery', label: 'Gallery' },
-    { href: '/contact', label: 'Contact' },
-  ];
-
-  if (!mounted) {
-    return (
-      <header style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        background: 'white',
-        zIndex: 1000,
-      }}>
-        <div style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          padding: '12px 24px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '45px', height: '45px', background: '#1e3a8a', borderRadius: '12px' }}></div>
-            <span style={{ fontSize: '22px', fontWeight: 'bold' }}>
-              <span style={{ color: '#fbbf24' }}>Khorshid</span>
-              <span style={{ color: '#1e3a8a' }}>Community</span>
-            </span>
-          </div>
-        </div>
-      </header>
-    );
-  }
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setIsOpen(false);
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <header style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      background: scrolled ? 'rgba(255, 255, 255, 0.98)' : 'white',
-      backdropFilter: scrolled ? 'blur(10px)' : 'none',
-      boxShadow: scrolled ? '0 4px 20px rgba(0,0,0,0.1)' : '0 1px 3px rgba(0,0,0,0.05)',
-      zIndex: 1000,
-      transition: 'all 0.3s ease',
-    }}>
-      <div style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-        padding: '12px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-white/95 backdrop-blur-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.1)]'
+          : 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05)]'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+
         {/* Logo */}
-        <Link href="/" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          textDecoration: 'none',
-        }}>
-          <img 
-            src="/images/logo.jpg" 
-            alt="KhorshidCommunity Logo" 
-            style={{
-              width: '45px',
-              height: '45px',
-              borderRadius: '12px',
-              objectFit: 'cover',
-            }}
+        <Link href="/" className="flex items-center gap-3 shrink-0">
+          <Image
+            src="/images/logo.jpg"
+            alt="Khorshid Community logo"
+            width={45}
+            height={45}
+            className="rounded-xl object-cover"
+            priority
           />
-          <div>
-            <span style={{ 
-              fontSize: '22px', 
-              fontWeight: 'bold',
-              color: '#fbbf24',
-            }}>
-              Khorshid
-            </span>
-            <span style={{ 
-              fontSize: '22px', 
-              fontWeight: 'bold',
-              color: '#1e3a8a',
-            }}>
-              Community
-            </span>
-          </div>
+          <span>
+            <span className="text-xl sm:text-[22px] font-bold text-yellow-400">Khorshid</span>
+            <span className="text-xl sm:text-[22px] font-bold text-blue-900">Community</span>
+          </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        {!isMobile && (
-          <>
-            <div style={{
-              display: 'flex',
-              gap: '32px',
-              alignItems: 'center',
-              position: 'absolute',
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  style={{
-                    color: '#374151',
-                    textDecoration: 'none',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                    transition: 'color 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#fbbf24'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-
+        {/* Desktop Navigation — hidden on mobile via CSS */}
+        <nav className="hidden md:flex gap-6 lg:gap-8 items-center absolute left-1/2 -translate-x-1/2">
+          {NAV_LINKS.map((link) => (
             <Link
-              href="/contact"
-              style={{
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                color: '#1e3a8a',
-                padding: '10px 24px',
-                borderRadius: '50px',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'transform 0.2s ease',
-                display: 'inline-block',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              key={link.href}
+              href={link.href}
+              className="text-gray-700 text-[15px] font-medium hover:text-yellow-400 transition-colors duration-200"
             >
-              ✨ Join Us
+              {link.label}
             </Link>
-          </>
-        )}
+          ))}
+        </nav>
 
-        {/* Mobile Menu Button */}
-        {isMobile && (
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '28px',
-              cursor: 'pointer',
-              padding: '8px',
-              color: '#374151',
-              width: '44px',
-              height: '44px',
-              borderRadius: '8px',
-              transition: 'background 0.2s ease',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          >
-            {isOpen ? '✕' : '☰'}
-          </button>
-        )}
+        {/* Desktop CTA — hidden on mobile via CSS */}
+        <Link
+          href="/contact"
+          className="hidden md:inline-block bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold hover:scale-105 transition-transform duration-200 shrink-0"
+        >
+          ✨ Join Us
+        </Link>
+
+        {/* Mobile hamburger — hidden on desktop via CSS */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden p-2 text-gray-700 text-2xl w-11 h-11 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isOpen}
+        >
+          {isOpen ? '✕' : '☰'}
+        </button>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {isMobile && isOpen && (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-          padding: '20px 24px 24px',
-          background: 'white',
-          borderTop: '1px solid #e5e7eb',
-          animation: 'slideDown 0.3s ease',
-        }}>
-          {navLinks.map((link) => (
+      {/* Mobile dropdown */}
+      {isOpen && (
+        <div className="md:hidden flex flex-col gap-1 px-4 pb-6 pt-2 bg-white border-t border-gray-100 animate-[slideDown_0.25s_ease]">
+          {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              style={{
-                padding: '14px 16px',
-                color: '#374151',
-                textDecoration: 'none',
-                fontSize: '16px',
-                fontWeight: '500',
-                borderRadius: '12px',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#fef3c7';
-                e.currentTarget.style.color = '#fbbf24';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#374151';
-              }}
+              className="px-4 py-3.5 text-gray-700 text-base font-medium rounded-xl hover:bg-yellow-50 hover:text-yellow-500 transition-all duration-200"
             >
               {link.label}
             </Link>
@@ -240,38 +98,19 @@ export default function Header() {
           <Link
             href="/contact"
             onClick={() => setIsOpen(false)}
-            style={{
-              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-              color: '#1e3a8a',
-              padding: '14px 24px',
-              borderRadius: '50px',
-              textDecoration: 'none',
-              textAlign: 'center',
-              fontSize: '16px',
-              fontWeight: '600',
-              marginTop: '8px',
-              display: 'block',
-            }}
+            className="mt-2 block text-center bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 px-6 py-3.5 rounded-full text-base font-semibold"
           >
             ✨ Join Our Community
           </Link>
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes slideDown {
-            from {
-              opacity: 0;
-              transform: translateY(-10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `
-      }} />
+      <style>{`
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </header>
   );
 }
