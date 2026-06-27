@@ -6,4 +6,87 @@
   html {
     scroll-behavior: smooth;
   }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Premium text selection */
+  ::selection {
+    background: #fef3c7;
+    color: #1e3a8a;
+  }
+
+  /* Thin branded scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #d97706; }
+
+  /* Section divider wave utility */
+  .wave-bottom {
+    position: relative;
+  }
+  .wave-bottom::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: white;
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .wave-bottom-cream::after {
+    background: #faf8f4;
+  }
+
+  .wave-bottom-dark::after {
+    background: #0f172a;
+  }
+}
+
+@layer utilities {
+  /* Shimmer button effect */
+  .btn-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transition: left 0.5s ease;
+  }
+  .btn-shimmer:hover::after {
+    left: 150%;
+  }
+
+  /* Gold underline accent on headings */
+  .heading-accent {
+    position: relative;
+    display: inline-block;
+  }
+  .heading-accent::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 2.5rem;
+    height: 2px;
+    background: #d97706;
+    border-radius: 999px;
+  }
+
+  /* Subtle dot-grid background for cream sections */
+  .dot-grid {
+    background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
 }

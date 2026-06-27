@@ -45,8 +45,8 @@ export default function Header() {
             priority
           />
           <span>
-            <span className="text-xl sm:text-[22px] font-bold text-yellow-400">Khorshid</span>
-            <span className="text-xl sm:text-[22px] font-bold text-blue-900">Community</span>
+            <span className="font-display text-xl sm:text-[22px] font-semibold text-amber-500">Khorshid</span>
+            <span className="font-display text-xl sm:text-[22px] font-semibold text-blue-900">Community</span>
           </span>
         </Link>
 
@@ -56,7 +56,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-gray-700 text-[15px] font-medium hover:text-yellow-400 transition-colors duration-200"
+              className="text-gray-700 text-[15px] font-medium hover:text-amber-500 transition-colors duration-200"
             >
               {link.label}
             </Link>
@@ -66,9 +66,9 @@ export default function Header() {
         {/* Desktop CTA — hidden on mobile via CSS */}
         <Link
           href="/contact"
-          className="hidden md:inline-block bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold hover:scale-105 transition-transform duration-200 shrink-0"
+          className="hidden md:inline-block btn-shimmer bg-amber-400 hover:bg-amber-500 text-blue-900 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 shrink-0"
         >
-          ✨ Join Us
+          Join Us
         </Link>
 
         {/* Mobile hamburger — hidden on desktop via CSS */}
@@ -90,7 +90,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="px-4 py-3.5 text-gray-700 text-base font-medium rounded-xl hover:bg-yellow-50 hover:text-yellow-500 transition-all duration-200"
+              className="px-4 py-3.5 text-gray-700 text-base font-medium rounded-xl hover:bg-amber-50 hover:text-amber-600 transition-all duration-200"
             >
               {link.label}
             </Link>
@@ -98,9 +98,9 @@ export default function Header() {
           <Link
             href="/contact"
             onClick={() => setIsOpen(false)}
-            className="mt-2 block text-center bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 px-6 py-3.5 rounded-full text-base font-semibold"
+            className="mt-2 block text-center bg-amber-400 hover:bg-amber-500 text-blue-900 px-6 py-3.5 rounded-full text-base font-semibold transition-colors"
           >
-            ✨ Join Our Community
+            Join Our Community
           </Link>
         </div>
       )}

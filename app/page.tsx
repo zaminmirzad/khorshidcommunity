@@ -39,195 +39,222 @@ const jsonLd = {
   alternateName: 'Khorshid Community San Diego',
   url: SITE_CONFIG.url,
   logo: `${SITE_CONFIG.url}/logo.png`,
-  sameAs: [
-    'https://www.instagram.com/khorshidcommunity',
-    'https://www.facebook.com/khorshidcommunity',
-    'https://twitter.com/khorshidcommunity',
-  ],
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'San Diego',
-    addressRegion: 'CA',
-    addressCountry: 'US',
-  },
+  sameAs: ['https://www.instagram.com/khorshidcommunity', 'https://www.facebook.com/khorshidcommunity', 'https://twitter.com/khorshidcommunity'],
+  address: { '@type': 'PostalAddress', addressLocality: 'San Diego', addressRegion: 'CA', addressCountry: 'US' },
   areaServed: 'San Diego, CA',
   nonprofitStatus: 'Nonprofit501c3',
   description: 'Persian and Hazara cultural community center in San Diego offering events, language classes, and support services.',
   foundingDate: String(SITE_CONFIG.foundingYear),
-  keywords: 'Persian community San Diego, Hazara community, Iranian American, cultural events',
-};
-
-const eventsJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  itemListElement: FEATURED_EVENTS
-    .filter((e) => e.schemaDate)
-    .map((event, i) => ({
-      '@type': 'Event',
-      position: i + 1,
-      name: event.title,
-      startDate: event.schemaDate,
-      location: {
-        '@type': 'Place',
-        name: event.location,
-        address: { '@type': 'PostalAddress', addressLocality: 'San Diego', addressRegion: 'CA' },
-      },
-      organizer: { '@type': 'Organization', name: SITE_CONFIG.name, url: SITE_CONFIG.url },
-      description: event.description,
-      eventStatus: 'https://schema.org/EventScheduled',
-      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    })),
 };
 
 export default function Home() {
   return (
     <>
       <Script id="json-ld-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Script id="json-ld-events" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }} />
 
-      {/* Hero */}
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/90 via-blue-900/85 to-blue-950/90 z-10" />
-          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/hero-section.jpg')" }} />
+        {/* Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[url('/images/hero-section.jpg')] bg-cover bg-center" />
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/80 via-blue-950/75 to-blue-950/95" />
         </div>
 
-        <div className="relative z-20 container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 lg:py-32 text-center text-white">
-          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 md:mb-8 text-xs sm:text-sm font-semibold tracking-wide bg-white/10 backdrop-blur-md rounded-full border border-white/20">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-400 rounded-full animate-pulse" />
-            Established {SITE_CONFIG.foundingYear} • Nonprofit Organization
+        {/* Decorative vertical line */}
+        <div className="absolute left-6 sm:left-10 top-1/2 -translate-y-1/2 hidden lg:flex flex-col items-center gap-3 z-20">
+          <span className="w-px h-20 bg-white/20" />
+          <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+          <span className="w-px h-20 bg-white/20" />
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 py-20 lg:py-32 text-center text-white">
+
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 mb-8 text-xs font-semibold tracking-[0.15em] uppercase bg-white/10 backdrop-blur-md rounded-full border border-white/15">
+            <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
+            Established {SITE_CONFIG.foundingYear} · Nonprofit 501(c)(3)
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-3 sm:mb-4 md:mb-6 tracking-tight">
-            <span className="text-yellow-400">Khorshid</span>
-            <span className="text-blue-300">Community</span>
+          {/* Heading */}
+          <h1 className="mb-6 tracking-tight">
+            <span className="block font-display font-light italic text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl text-amber-300 leading-none mb-1">
+              Khorshid
+            </span>
+            <span className="block font-display font-semibold text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-white leading-none">
+              Community
+            </span>
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl max-w-4xl mx-auto mb-4 sm:mb-6 md:mb-8 text-blue-100 leading-relaxed px-2">
-            Keeping Our Culture Alive,<br className="hidden xs:block" />Uniting Generations, Building a Vibrant Future
+          {/* Decorative rule */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <span className="w-16 sm:w-24 h-px bg-amber-400/50" />
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span className="w-16 sm:w-24 h-px bg-amber-400/50" />
+          </div>
+
+          <p className="font-display font-light italic text-xl sm:text-2xl md:text-3xl text-blue-100 max-w-3xl mx-auto mb-4 leading-relaxed">
+            Keeping Our Culture Alive, Uniting Generations,
+            <br className="hidden sm:block" /> Building a Vibrant Future
           </p>
 
-          <p className="text-sm sm:text-base md:text-lg text-gray-200 max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 px-4">
+          <p className="font-sans text-sm sm:text-base text-gray-300 max-w-xl mx-auto mb-10">
             Join 5,000+ members celebrating Hazara and Persian heritage through cultural events,
-            educational programs, and community support initiatives.
+            educational programs, and community support in San Diego.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 justify-center px-4">
-            <Link href="/events" className="group inline-flex items-center justify-center px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold text-blue-900 bg-yellow-400 rounded-xl hover:bg-yellow-500 transition-all duration-300 shadow-2xl hover:shadow-xl transform hover:-translate-y-0.5">
-              Explore Upcoming Events
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/events"
+              className="btn-shimmer group inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-semibold text-blue-950 bg-amber-400 hover:bg-amber-500 rounded-full transition-all duration-300 shadow-[0_0_30px_rgba(251,191,36,0.3)] hover:shadow-[0_0_40px_rgba(251,191,36,0.5)]"
+            >
+              Explore Events
+              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
-            <Link href="/about" className="inline-flex items-center justify-center px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold text-white bg-white/20 backdrop-blur-sm rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/30">
-              Discover Our Story
+            <Link
+              href="/about"
+              className="inline-flex items-center justify-center px-7 py-3.5 text-sm font-semibold text-white rounded-full border border-white/30 hover:border-white/60 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+            >
+              Our Story
             </Link>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 mt-8 sm:mt-10 md:mt-12 lg:mt-16">
+          {/* Stats */}
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 mt-16 pt-10 border-t border-white/10">
             {[
               { value: '5,200+', label: 'Lives Impacted' },
               { value: '48', label: 'Annual Events' },
-              { value: '350+', label: 'Active Volunteers' },
-            ].map((stat, i) => (
-              <div key={i} className="flex items-center gap-3 sm:gap-4 md:gap-6 lg:gap-8">
-                {i > 0 && <div className="w-px h-6 sm:h-8 md:h-10 lg:h-12 bg-white/30" />}
-                <div className="text-center px-2 sm:px-3 md:px-4">
-                  <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">{stat.value}</div>
-                  <div className="text-xs sm:text-sm text-yellow-300">{stat.label}</div>
+              { value: '350+', label: 'Volunteers' },
+            ].map((s, i) => (
+              <div key={s.label} className="flex items-center gap-8 sm:gap-12">
+                {i > 0 && <span className="w-px h-8 bg-white/20 hidden sm:block" />}
+                <div className="text-center">
+                  <div className="font-display text-3xl sm:text-4xl font-light text-amber-300">{s.value}</div>
+                  <div className="text-xs text-blue-300 tracking-widest uppercase mt-1">{s.label}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 lg:bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-20">
-          <div className="w-5 h-7 sm:w-6 sm:h-10 border-2 border-white rounded-full flex justify-center">
-            <div className="w-1 h-1.5 sm:w-1.5 sm:h-2 bg-yellow-400 rounded-full mt-1.5 sm:mt-2 animate-pulse" />
-          </div>
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 opacity-60">
+          <span className="text-white text-[10px] tracking-[0.2em] uppercase">Scroll</span>
+          <span className="w-px h-8 bg-white/50" />
         </div>
       </section>
 
-      {/* Mission */}
-      <section className="py-20 bg-gradient-to-r from-blue-50 to-indigo-50">
+      {/* ── Mission ──────────────────────────────────────────────────────── */}
+      <section className="py-24 bg-[#faf8f4]">
         <div className="container mx-auto px-6 text-center max-w-4xl">
-          <span className="text-yellow-600 font-semibold uppercase text-sm tracking-wide">Our Purpose</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-3 mb-6">
-            One Community. One Family. One Future.
+          <span className="inline-flex items-center gap-3 text-amber-600 font-semibold uppercase text-[11px] tracking-[0.2em] mb-6">
+            <span className="w-10 h-px bg-amber-400" />
+            Our Purpose
+            <span className="w-10 h-px bg-amber-400" />
+          </span>
+          <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900 mb-6 leading-tight">
+            One Community.{' '}
+            <em className="italic text-blue-900">One Family.</em>{' '}
+            One Future.
           </h2>
-          <p className="text-lg text-gray-700 leading-relaxed">
+          <p className="text-gray-500 text-lg leading-relaxed">
             KhorshidCommunity bridges generations, preserves Hazara and Persian heritage, and empowers
             individuals through connection, culture, and compassionate action.
           </p>
         </div>
       </section>
 
-      {/* Programs */}
-      <section className="py-24 bg-white">
+      {/* ── Programs ─────────────────────────────────────────────────────── */}
+      <section className="py-28 bg-white">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-yellow-600 font-semibold tracking-wide uppercase text-sm">Comprehensive Programs</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mt-2 mb-4">What We Do</h2>
-            <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full" />
-            <p className="text-gray-600 text-lg mt-6">KhorshidCommunity is the heartbeat of cultural preservation and community empowerment through six core pillars.</p>
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-3 text-amber-600 font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
+              <span className="w-10 h-px bg-amber-400" />
+              What We Do
+              <span className="w-10 h-px bg-amber-400" />
+            </span>
+            <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900 leading-tight">
+              Six Pillars of <em className="italic text-blue-900">Community</em>
+            </h2>
+            <p className="text-gray-400 mt-4 text-base">Cultural preservation and empowerment through every stage of life.</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PROGRAMS.map((item) => (
-              <div key={item.title} className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100">
-                <div className="text-5xl mb-4">{item.icon}</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">{item.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{item.desc}</p>
+              <div key={item.title} className="group bg-white rounded-2xl p-8 border border-gray-100 hover:border-amber-200 hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 group-hover:from-amber-50 group-hover:to-yellow-50 rounded-2xl flex items-center justify-center text-3xl mb-6 transition-colors duration-300">
+                  {item.icon}
+                </div>
+                <h3 className="font-display font-semibold text-xl text-gray-900 mb-3">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+                <div className="mt-6 pt-5 border-t border-gray-100 flex items-center gap-1.5 text-amber-600 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span>Learn more</span>
+                  <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Upcoming Events */}
-      <section className="py-24 bg-gradient-to-br from-blue-950 to-blue-900 text-white">
+      {/* ── Upcoming Events ──────────────────────────────────────────────── */}
+      <section className="py-28 bg-gradient-to-br from-blue-950 via-blue-900 to-[#0a1628]">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <span className="text-yellow-400 font-semibold tracking-wide uppercase text-sm">Join Us</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-4">Upcoming Events</h2>
-            <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full" />
-            <p className="text-gray-300 mt-4 text-lg">Don't miss out on our flagship celebrations and programs</p>
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-3 text-amber-400/80 font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
+              <span className="w-10 h-px bg-amber-400/50" />
+              Join Us
+              <span className="w-10 h-px bg-amber-400/50" />
+            </span>
+            <h2 className="font-display font-light text-4xl md:text-5xl text-white">
+              Upcoming <em className="italic text-amber-300">Events</em>
+            </h2>
           </div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {FEATURED_EVENTS.map((event) => (
-              <div key={event.id} className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                <div className="relative h-56 overflow-hidden bg-gray-200">
+              <div key={event.id} className="group bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-amber-400/40 hover:bg-white/10 transition-all duration-500 hover:-translate-y-1">
+                <div className="relative h-52 overflow-hidden">
                   <Image
                     src={event.image}
                     alt={event.alt}
                     fill
-                    className="object-cover hover:scale-110 transition-transform duration-500"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
-                  <div className="absolute top-4 left-4 bg-yellow-500 text-blue-900 px-3 py-1 rounded-lg font-bold text-sm z-10">
+                  <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 to-transparent" />
+                  <span className="absolute top-4 left-4 bg-amber-400 text-blue-950 px-3 py-1 rounded-full font-semibold text-xs tracking-wide">
                     {event.date}
-                  </div>
+                  </span>
                 </div>
-                <div className="p-6 text-gray-800">
-                  <h3 className="text-xl font-bold mb-2">{event.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4">{event.description}</p>
-                  <div className="flex items-center text-gray-500 text-sm mb-4">
-                    <svg className="w-4 h-4 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    {event.location}
+                <div className="p-6">
+                  <h3 className="font-display font-semibold text-xl text-white mb-2">{event.title}</h3>
+                  <p className="text-blue-300 text-sm mb-4 leading-relaxed">{event.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-blue-400 text-xs flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {event.location}
+                    </span>
+                    <Link href="/events" className="text-amber-400 hover:text-amber-300 text-sm font-semibold transition-colors">
+                      Details →
+                    </Link>
                   </div>
-                  <Link href="/events" className="inline-block px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold rounded-lg transition-all text-sm">
-                    Learn More →
-                  </Link>
                 </div>
               </div>
             ))}
           </div>
+
           <div className="text-center mt-12">
-            <Link href="/events" className="inline-flex items-center px-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold rounded-xl transition-all shadow-lg">
+            <Link href="/events" className="btn-shimmer inline-flex items-center gap-2 px-8 py-3.5 bg-amber-400 hover:bg-amber-500 text-blue-950 font-semibold rounded-full transition-all duration-300 text-sm">
               View All Events
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
@@ -235,38 +262,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Impact Stats */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <span className="text-yellow-600 font-semibold tracking-wide uppercase text-sm">Our Impact</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-2">Making a Difference Daily</h2>
+      {/* ── Impact Stats ─────────────────────────────────────────────────── */}
+      <section className="py-24 bg-[#faf8f4] dot-grid">
+        <div className="container mx-auto px-6 relative">
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-3 text-amber-600 font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
+              <span className="w-10 h-px bg-amber-400" />
+              Our Impact
+              <span className="w-10 h-px bg-amber-400" />
+            </span>
+            <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900">
+              Making a <em className="italic text-blue-900">Difference</em> Daily
+            </h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
             {STATS.map((stat) => (
-              <div key={stat.label} className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl">
-                <div className="text-4xl mb-3">{stat.icon}</div>
-                <div className="text-3xl md:text-4xl font-bold text-blue-900">{stat.number}</div>
-                <div className="text-gray-600 font-medium mt-1">{stat.label}</div>
+              <div key={stat.label} className="group bg-white rounded-2xl p-6 sm:p-8 text-center shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-amber-200">
+                <div className="text-4xl mb-4">{stat.icon}</div>
+                <div className="font-display text-3xl sm:text-4xl font-light text-blue-900 mb-1">{stat.number}</div>
+                <div className="text-gray-400 text-xs font-semibold uppercase tracking-widest">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-24 bg-gradient-to-r from-blue-900 to-blue-950 text-white">
-        <div className="container mx-auto px-6 text-center max-w-5xl">
-          <span className="text-yellow-400 font-semibold uppercase text-sm tracking-wide">Voices of Our Community</span>
-          <h2 className="text-4xl font-bold mt-3 mb-12">What Members Say</h2>
-          <div className="grid md:grid-cols-2 gap-8">
+      {/* ── Testimonials ─────────────────────────────────────────────────── */}
+      <section className="py-28 bg-gradient-to-r from-blue-950 to-[#0a1628]">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-3 text-amber-400/80 font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
+              <span className="w-10 h-px bg-amber-400/50" />
+              Voices of Our Community
+              <span className="w-10 h-px bg-amber-400/50" />
+            </span>
+            <h2 className="font-display font-light text-4xl md:text-5xl text-white">
+              What <em className="italic text-amber-300">Members</em> Say
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
             {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl text-left">
-                <div className="text-6xl text-yellow-400 mb-4">"</div>
-                <p className="text-lg italic leading-relaxed">{t.quote}</p>
-                <div className="mt-6">
-                  <div className="font-bold text-xl">{t.name}</div>
-                  <div className="text-yellow-300 text-sm">{t.role}</div>
+              <div key={t.name} className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-amber-400/30 transition-all duration-300">
+                <div className="font-display text-7xl text-amber-400/30 leading-none mb-4 group-hover:text-amber-400/50 transition-colors">"</div>
+                <p className="font-display font-light italic text-lg text-blue-100 leading-relaxed mb-8">{t.quote}</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-white/10">
+                  <div className="w-8 h-px bg-amber-400" />
+                  <div>
+                    <div className="font-semibold text-white text-sm">{t.name}</div>
+                    <div className="text-amber-400/70 text-xs">{t.role}</div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -274,44 +318,64 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Latest News */}
-      <section className="py-24 bg-gray-50">
+      {/* ── Latest News ──────────────────────────────────────────────────── */}
+      <section className="py-28 bg-white">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <span className="text-yellow-600 font-semibold tracking-wide uppercase text-sm">Stay Informed</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-2">Latest Updates</h2>
-            <div className="w-24 h-1 bg-yellow-500 mx-auto rounded-full mt-4" />
+          <div className="text-center mb-16">
+            <span className="inline-flex items-center gap-3 text-amber-600 font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
+              <span className="w-10 h-px bg-amber-400" />
+              Stay Informed
+              <span className="w-10 h-px bg-amber-400" />
+            </span>
+            <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900">
+              Latest <em className="italic text-blue-900">Updates</em>
+            </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {NEWS.map((item) => (
-              <div key={item.title} className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all">
-                <div className="text-sm text-yellow-600 font-semibold mb-2">{item.category}</div>
-                <div className="text-xs text-gray-400 mb-2">{item.date}</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.desc}</p>
-              </div>
+              <article key={item.title} className="group border-t-2 border-gray-100 hover:border-amber-400 pt-6 transition-colors duration-300">
+                <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full mb-3">{item.category}</span>
+                <div className="text-gray-400 text-xs mb-3 tracking-wide">{item.date}</div>
+                <h3 className="font-display font-semibold text-xl text-gray-900 mb-3 group-hover:text-blue-900 transition-colors leading-snug">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+                <span className="inline-flex items-center gap-1 mt-4 text-amber-600 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read More →
+                </span>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section className="py-20 bg-blue-950">
-        <div className="container mx-auto px-6 text-center max-w-3xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Join Our Newsletter</h2>
-          <p className="text-blue-200 mb-8 text-lg">Stay updated on events, programs, and community news — delivered monthly.</p>
+      {/* ── Newsletter ───────────────────────────────────────────────────── */}
+      <section className="py-24 bg-gradient-to-br from-blue-950 to-[#0a1628] relative overflow-hidden">
+        {/* Subtle background ornament */}
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 80% 50%, #fbbf24 0%, transparent 60%)' }} />
+        <div className="container mx-auto px-6 text-center max-w-2xl relative z-10">
+          <span className="inline-flex items-center gap-3 text-amber-400/80 font-semibold uppercase text-[11px] tracking-[0.2em] mb-6">
+            <span className="w-10 h-px bg-amber-400/50" />
+            Stay Connected
+            <span className="w-10 h-px bg-amber-400/50" />
+          </span>
+          <h2 className="font-display font-light text-4xl md:text-5xl text-white mb-4">
+            Join Our <em className="italic text-amber-300">Newsletter</em>
+          </h2>
+          <p className="text-blue-300 mb-10 text-base">Events, programs, and community news — delivered monthly to your inbox.</p>
           <NewsletterForm />
-          <p className="text-blue-300 text-sm mt-4">We respect your privacy. Unsubscribe anytime.</p>
+          <p className="text-blue-500 text-xs mt-5 tracking-wide">We respect your privacy · Unsubscribe anytime</p>
         </div>
       </section>
 
-      {/* Floating CTA */}
+      {/* ── Floating CTA ─────────────────────────────────────────────────── */}
       <div className="fixed bottom-6 right-6 z-50">
-        <Link href="/contact" className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-blue-900 px-5 py-3 rounded-full shadow-2xl transition-all hover:scale-105">
-          <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <Link
+          href="/contact"
+          className="btn-shimmer flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-blue-950 px-5 py-3 rounded-full shadow-[0_8px_30px_rgba(251,191,36,0.4)] hover:shadow-[0_8px_30px_rgba(251,191,36,0.6)] transition-all duration-300 font-semibold text-sm"
+        >
+          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
-          <span className="font-semibold">Get Involved</span>
+          Get Involved
         </Link>
       </div>
     </>
