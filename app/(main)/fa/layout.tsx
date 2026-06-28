@@ -1,8 +1,8 @@
 // app/fa/layout.tsx
 // FIX (SEO): Separate layout for Persian routes sets lang="fa" dir="rtl"
 // so Google correctly indexes Farsi content instead of treating it as English.
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '@/app/components/Header';
+import Footer from '@/app/components/Footer';
 
 export const metadata = {
   title: "کمیونیتی خورشید | مرکز فرهنگی فارسی و هزاره در سن دیگو",
