@@ -11,6 +11,7 @@ module.exports = {
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        persian: ['var(--font-persian)', 'Noto Naskh Arabic', 'serif'],
       },
 
       colors: {

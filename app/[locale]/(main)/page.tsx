@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
-import NewsletterForm from '@/app/components/NewsletterForm';
+import { getTranslations } from 'next-intl/server';
 import { FEATURED_EVENTS } from '@/lib/data/events';
 import { SITE_CONFIG } from '@/lib/constants';
 
-const PROGRAMS = [
+type Props = { params: Promise<{ locale: string }> };
+
+const EN_PROGRAMS = [
   { icon: '🎭', title: 'Cultural Festivals', desc: 'Annual Nowruz celebrations, Mehregan festivals, traditional music concerts, and dance workshops that bring our heritage to life.' },
   { icon: '📚', title: 'Educational Programs', desc: 'Persian language classes for all levels, heritage storytelling sessions, history workshops, and children\'s cultural education.' },
   { icon: '🤝', title: 'Community Support', desc: 'Elderly assistance programs, food drives, crisis relief, newcomer settlement support, and family counseling services.' },
@@ -14,22 +16,49 @@ const PROGRAMS = [
   { icon: '🏆', title: 'Sports & Wellness', desc: 'Community sports leagues, yoga sessions, hiking clubs, and health awareness programs for all ages.' },
 ];
 
-const STATS = [
+const FA_PROGRAMS = [
+  { icon: '🎭', title: 'جشنواره‌های فرهنگی', desc: 'جشن‌های سالانه نوروز، جشن‌های مهرگان، کنسرت‌های موسیقی سنتی و کارگاه‌های رقص که میراث ما را زنده می‌کند.' },
+  { icon: '📚', title: 'برنامه‌های آموزشی', desc: 'کلاس‌های زبان فارسی برای همه سطوح، جلسات داستان‌گویی میراثی، کارگاه‌های تاریخ و آموزش فرهنگی کودکان.' },
+  { icon: '🤝', title: 'حمایت از کمیونیتی', desc: 'برنامه‌های کمک به سالمندان، کمپین‌های غذایی، کمک در بحران، حمایت از تازه‌واردان و خدمات مشاوره خانوادگی.' },
+  { icon: '🌱', title: 'رهبری جوانان', desc: 'توانمندسازی رهبران نسل بعدی از طریق برنامه‌های مربیگری، کارگاه‌های مشارکت مدنی و ابتکارات توسعه شغلی.' },
+  { icon: '🎨', title: 'هنر و بیان', desc: 'کارگاه‌های خوشنویسی، نقاشی مینیاتور فارسی، شب‌های شعر با رومی و حافظ، و کلاس‌های موسیقی سنتی.' },
+  { icon: '🏆', title: 'ورزش و سلامت', desc: 'لیگ‌های ورزشی کمیونیتی، جلسات یوگا، باشگاه‌های پیاده‌روی و برنامه‌های آگاهی بهداشتی برای همه سنین.' },
+];
+
+const EN_STATS = [
   { number: '1,200+', label: 'Active Members', icon: '👥' },
   { number: '40+', label: 'Monthly Programs', icon: '📅' },
   { number: '15', label: 'Partner Orgs', icon: '🤝' },
   { number: '$250K+', label: 'Community Support', icon: '💝' },
 ];
 
-const TESTIMONIALS = [
+const FA_STATS = [
+  { number: '۱٬۲۰۰+', label: 'اعضای فعال', icon: '👥' },
+  { number: '۴۰+', label: 'برنامه ماهانه', icon: '📅' },
+  { number: '۱۵', label: 'سازمان شریک', icon: '🤝' },
+  { number: '$۲۵۰K+', label: 'حمایت اجتماعی', icon: '💝' },
+];
+
+const EN_TESTIMONIALS = [
   { quote: "KhorshidCommunity feels like home. Through their events, my children learned about our heritage in ways I couldn't teach alone. The community support is unmatched.", name: 'Maryam K.', role: 'Member since 2015' },
   { quote: 'This organization transformed my connection to our culture. From language classes to celebrations, every experience has been authentic and heartwarming.', name: 'Reza S.', role: 'Volunteer Leader' },
 ];
 
-const NEWS = [
+const FA_TESTIMONIALS = [
+  { quote: 'کمیونیتی خورشید برای من مثل خانه است. از طریق رویدادهای آنها، فرزندانم میراث ما را به روش‌هایی یاد گرفتند که من به تنهایی نمی‌توانستم آموزش دهم.', name: 'مریم ک.', role: 'عضو از سال ۲۰۱۵' },
+  { quote: 'این سازمان ارتباط من با فرهنگمان را متحول کرد. از کلاس‌های زبان تا جشن‌ها، هر تجربه‌ای اصیل و دلگرم‌کننده بوده است.', name: 'رضا ص.', role: 'رهبر داوطلب' },
+];
+
+const EN_NEWS = [
   { date: 'Jan 15, 2025', title: 'New Youth Mentorship Program Launches', desc: 'Empowering young adults with career guidance and cultural education.', category: 'Announcement' },
   { date: 'Jan 10, 2025', title: 'Nowruz Festival Seeks Volunteers', desc: 'Join our team to help organize the biggest Persian New Year celebration.', category: 'Volunteer' },
   { date: 'Jan 5, 2025', title: 'Community Food Drive Success', desc: 'Over 500 families received support during winter holidays.', category: 'Impact' },
+];
+
+const FA_NEWS = [
+  { date: '۱۵ ژانویه ۲۰۲۵', title: 'راه‌اندازی برنامه جدید مربیگری جوانان', desc: 'توانمندسازی جوانان با راهنمایی شغلی و آموزش فرهنگی.', category: 'اطلاعیه' },
+  { date: '۱۰ ژانویه ۲۰۲۵', title: 'جشنواره نوروز به دنبال داوطلب است', desc: 'به تیم ما بپیوندید تا در برگزاری بزرگترین جشن سال نو فارسی کمک کنید.', category: 'داوطلبی' },
+  { date: '۵ ژانویه ۲۰۲۵', title: 'موفقیت کمپین غذایی کمیونیتی', desc: 'بیش از ۵۰۰ خانواده در تعطیلات زمستانی حمایت دریافت کردند.', category: 'تأثیر' },
 ];
 
 const jsonLd = {
@@ -39,15 +68,24 @@ const jsonLd = {
   alternateName: 'Khorshid Community San Diego',
   url: SITE_CONFIG.url,
   logo: `${SITE_CONFIG.url}/logo.png`,
-  sameAs: ['https://www.instagram.com/khorshidcommunity', 'https://www.facebook.com/khorshidcommunity', 'https://twitter.com/khorshidcommunity'],
+  sameAs: ['https://www.instagram.com/khorshidcommunity', 'https://www.facebook.com/khorshidcommunity'],
   address: { '@type': 'PostalAddress', addressLocality: 'San Diego', addressRegion: 'CA', addressCountry: 'US' },
-  areaServed: 'San Diego, CA',
   nonprofitStatus: 'Nonprofit501c3',
   description: 'Persian and Hazara cultural community center in San Diego offering events, language classes, and support services.',
   foundingDate: String(SITE_CONFIG.foundingYear),
 };
 
-export default function Home() {
+export default async function Home({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations('home');
+  const isFa = locale === 'fa';
+
+  const programs = isFa ? FA_PROGRAMS : EN_PROGRAMS;
+  const stats = isFa ? FA_STATS : EN_STATS;
+  const testimonials = isFa ? FA_TESTIMONIALS : EN_TESTIMONIALS;
+  const news = isFa ? FA_NEWS : EN_NEWS;
+  const heroStats = t.raw('heroStats') as Array<{ value: string; label: string }>;
+
   return (
     <>
       <Script id="json-ld-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -65,10 +103,10 @@ export default function Home() {
           <span className="w-px h-20 bg-white/20" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 py-20 lg:py-32 text-center text-white">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 py-20 lg:py-32 text-center text-white" dir="ltr">
           <div className="inline-flex items-center gap-2.5 px-4 py-2 mb-8 text-xs font-semibold tracking-[0.15em] uppercase bg-white/10 backdrop-blur-md rounded-full border border-white/15">
             <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
-            Established {SITE_CONFIG.foundingYear} · Nonprofit 501(c)(3)
+            {t('badge')}
           </div>
 
           <h1 className="mb-6 tracking-tight">
@@ -86,13 +124,11 @@ export default function Home() {
             <span className="w-16 sm:w-24 h-px bg-accent/50" />
           </div>
 
-          <p className="font-display font-light italic text-xl sm:text-2xl md:text-3xl text-brand-100 max-w-3xl mx-auto mb-4 leading-relaxed">
-            Keeping Our Culture Alive, Uniting Generations,
-            <br className="hidden sm:block" /> Building a Vibrant Future
+          <p className={`font-display font-light italic text-xl sm:text-2xl md:text-3xl text-brand-100 max-w-3xl mx-auto mb-4 leading-relaxed${isFa ? ' font-persian' : ''}`}>
+            {t('heroSubtitle')}
           </p>
           <p className="font-sans text-sm sm:text-base text-brand-300 max-w-xl mx-auto mb-10">
-            Join 5,000+ members celebrating Hazara and Persian heritage through cultural events,
-            educational programs, and community support in San Diego.
+            {t('heroBody')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -100,22 +136,18 @@ export default function Home() {
               href="/events"
               className="btn-shimmer group inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-semibold text-brand-950 bg-accent hover:bg-accent-hover rounded-full transition-all duration-300 shadow-[0_0_30px_rgba(251,191,36,0.3)] hover:shadow-[0_0_40px_rgba(251,191,36,0.5)]"
             >
-              Explore Events
+              {t('heroCta1')}
               <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
             <Link href="/about" className="inline-flex items-center justify-center px-7 py-3.5 text-sm font-semibold text-white rounded-full border border-white/30 hover:border-white/60 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm">
-              Our Story
+              {t('heroCta2')}
             </Link>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 mt-16 pt-10 border-t border-white/10">
-            {[
-              { value: '5,200+', label: 'Lives Impacted' },
-              { value: '48', label: 'Annual Events' },
-              { value: '350+', label: 'Volunteers' },
-            ].map((s, i) => (
+            {heroStats.map((s, i) => (
               <div key={s.label} className="flex items-center gap-8 sm:gap-12">
                 {i > 0 && <span className="w-px h-8 bg-white/20 hidden sm:block" />}
                 <div className="text-center">
@@ -137,15 +169,12 @@ export default function Home() {
       <section className="py-24 bg-surface-alt">
         <div className="container mx-auto px-6 text-center max-w-4xl">
           <span className="inline-flex items-center gap-3 text-accent-dark font-semibold uppercase text-[11px] tracking-[0.2em] mb-6">
-            <span className="w-10 h-px bg-accent" />Our Purpose<span className="w-10 h-px bg-accent" />
+            <span className="w-10 h-px bg-accent" />{t('missionOverline')}<span className="w-10 h-px bg-accent" />
           </span>
           <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900 mb-6 leading-tight">
-            One Community. <em className="italic text-brand-900">One Family.</em> One Future.
+            {t('missionTitle')}
           </h2>
-          <p className="text-gray-500 text-lg leading-relaxed">
-            KhorshidCommunity bridges generations, preserves Hazara and Persian heritage, and empowers
-            individuals through connection, culture, and compassionate action.
-          </p>
+          <p className="text-gray-500 text-lg leading-relaxed">{t('missionBody')}</p>
         </div>
       </section>
 
@@ -154,15 +183,15 @@ export default function Home() {
         <div className="container mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="inline-flex items-center gap-3 text-accent-dark font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
-              <span className="w-10 h-px bg-accent" />What We Do<span className="w-10 h-px bg-accent" />
+              <span className="w-10 h-px bg-accent" />{t('programsOverline')}<span className="w-10 h-px bg-accent" />
             </span>
             <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900 leading-tight">
-              Six Pillars of <em className="italic text-brand-900">Community</em>
+              {t('programsTitle')}
             </h2>
-            <p className="text-gray-400 mt-4 text-base">Cultural preservation and empowerment through every stage of life.</p>
+            <p className="text-gray-400 mt-4 text-base">{t('programsSubtitle')}</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PROGRAMS.map((item) => (
+            {programs.map((item) => (
               <div key={item.title} className="group bg-surface rounded-2xl p-8 border border-gray-100 hover:border-accent-light hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5">
                 <div className="w-14 h-14 bg-brand-50 group-hover:bg-accent-light rounded-2xl flex items-center justify-center text-3xl mb-6 transition-colors duration-300">
                   {item.icon}
@@ -170,7 +199,7 @@ export default function Home() {
                 <h3 className="font-display font-semibold text-xl text-gray-900 mb-3">{item.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
                 <div className="mt-6 pt-5 border-t border-gray-100 flex items-center gap-1.5 text-accent-dark text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span>Learn more</span>
+                  <span>{t('programsLearnMore')}</span>
                   <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -188,13 +217,14 @@ export default function Home() {
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-3 text-accent/80 font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
-              <span className="w-10 h-px bg-accent/50" />Join Us<span className="w-10 h-px bg-accent/50" />
+              <span className="w-10 h-px bg-accent/50" />{t('eventsOverline')}<span className="w-10 h-px bg-accent/50" />
             </span>
             <h2 className="font-display font-light text-4xl md:text-5xl text-white">
-              Upcoming <em className="italic text-accent-muted">Events</em>
+              {isFa ? 'رویدادهای' : 'Upcoming'}{' '}
+              <em className="italic text-accent-muted">{isFa ? 'پیش رو' : 'Events'}</em>
             </h2>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto" dir="ltr">
             {FEATURED_EVENTS.map((event) => (
               <div key={event.id} className="group bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-accent/40 hover:bg-white/10 transition-all duration-500 hover:-translate-y-1">
                 <div className="relative h-52 overflow-hidden">
@@ -213,7 +243,7 @@ export default function Home() {
                       </svg>
                       {event.location}
                     </span>
-                    <Link href="/events" className="text-accent hover:text-accent-hover text-sm font-semibold transition-colors">Details →</Link>
+                    <Link href="/events" className="text-accent hover:text-accent-hover text-sm font-semibold transition-colors">{t('eventsDetails')}</Link>
                   </div>
                 </div>
               </div>
@@ -221,7 +251,7 @@ export default function Home() {
           </div>
           <div className="text-center mt-12">
             <Link href="/events" className="btn-shimmer inline-flex items-center gap-2 px-8 py-3.5 bg-accent hover:bg-accent-hover text-brand-950 font-semibold rounded-full transition-all duration-300 text-sm">
-              View All Events
+              {t('eventsViewAll')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </Link>
           </div>
@@ -233,14 +263,16 @@ export default function Home() {
         <div className="container mx-auto px-6 relative">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-3 text-accent-dark font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
-              <span className="w-10 h-px bg-accent" />Our Impact<span className="w-10 h-px bg-accent" />
+              <span className="w-10 h-px bg-accent" />{t('impactOverline')}<span className="w-10 h-px bg-accent" />
             </span>
             <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900">
-              Making a <em className="italic text-brand-900">Difference</em> Daily
+              {isFa ? 'تفاوت‌آفرینی در' : 'Making a'}{' '}
+              <em className="italic text-brand-900">{isFa ? 'هر روز' : 'Difference'}</em>
+              {!isFa && ' Daily'}
             </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-            {STATS.map((stat) => (
+            {stats.map((stat) => (
               <div key={stat.label} className="group bg-surface rounded-2xl p-6 sm:p-8 text-center shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-accent-light">
                 <div className="text-4xl mb-4">{stat.icon}</div>
                 <div className="font-display text-3xl sm:text-4xl font-light text-brand-900 mb-1">{stat.number}</div>
@@ -258,22 +290,24 @@ export default function Home() {
         <div className="container mx-auto px-6 max-w-5xl relative z-10">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-3 text-accent/80 font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
-              <span className="w-10 h-px bg-accent/50" />Voices of Our Community<span className="w-10 h-px bg-accent/50" />
+              <span className="w-10 h-px bg-accent/50" />{t('testimonialsOverline')}<span className="w-10 h-px bg-accent/50" />
             </span>
             <h2 className="font-display font-light text-4xl md:text-5xl text-white">
-              What <em className="italic text-accent-muted">Members</em> Say
+              {isFa ? 'نظر' : 'What'}{' '}
+              <em className="italic text-accent-muted">{isFa ? 'اعضا' : 'Members'}</em>
+              {!isFa && ' Say'}
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-accent/30 transition-all duration-300">
+            {testimonials.map((item) => (
+              <div key={item.name} className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-accent/30 transition-all duration-300">
                 <div className="font-display text-7xl text-accent/30 leading-none mb-4 group-hover:text-accent/50 transition-colors">"</div>
-                <p className="font-display font-light italic text-lg text-brand-100 leading-relaxed mb-8">{t.quote}</p>
+                <p className="font-display font-light italic text-lg text-brand-100 leading-relaxed mb-8">{item.quote}</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-white/10">
                   <div className="w-8 h-px bg-accent" />
                   <div>
-                    <div className="font-semibold text-white text-sm">{t.name}</div>
-                    <div className="text-accent/70 text-xs">{t.role}</div>
+                    <div className="font-semibold text-white text-sm">{item.name}</div>
+                    <div className="text-accent/70 text-xs">{item.role}</div>
                   </div>
                 </div>
               </div>
@@ -287,27 +321,26 @@ export default function Home() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-3 text-accent-dark font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
-              <span className="w-10 h-px bg-accent" />Stay Informed<span className="w-10 h-px bg-accent" />
+              <span className="w-10 h-px bg-accent" />{t('newsOverline')}<span className="w-10 h-px bg-accent" />
             </span>
             <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900">
-              Latest <em className="italic text-brand-900">Updates</em>
+              {isFa ? 'آخرین' : 'Latest'}{' '}
+              <em className="italic text-brand-900">{isFa ? 'اخبار' : 'Updates'}</em>
             </h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {NEWS.map((item) => (
+            {news.map((item) => (
               <article key={item.title} className="group border-t-2 border-gray-100 hover:border-accent pt-6 transition-colors duration-300">
                 <span className="inline-block px-3 py-1 bg-brand-50 text-brand-700 text-xs font-semibold rounded-full mb-3">{item.category}</span>
                 <div className="text-gray-400 text-xs mb-3 tracking-wide">{item.date}</div>
                 <h3 className="font-display font-semibold text-xl text-gray-900 mb-3 group-hover:text-brand-900 transition-colors leading-snug">{item.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
-                <span className="inline-flex items-center gap-1 mt-4 text-accent-dark text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Read More →</span>
+                <span className="inline-flex items-center gap-1 mt-4 text-accent-dark text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">{t('newsReadMore')}</span>
               </article>
             ))}
           </div>
         </div>
       </section>
-
-      
 
       {/* ── Floating CTA ─────────────────────────────────────────────────── */}
       <div className="fixed bottom-6 right-6 z-50">
@@ -315,7 +348,7 @@ export default function Home() {
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
-          Get Involved
+          {t('floatingCta')}
         </Link>
       </div>
     </>

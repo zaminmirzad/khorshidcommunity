@@ -1,48 +1,23 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import PageHero from '@/app/components/PageHero';
 import { SITE_CONFIG } from '@/lib/constants';
 
-const SUBJECTS = [
-  'General Inquiry', 'Volunteer Opportunities', 'Event Participation',
-  'Partnership/Collaboration', 'Donation Support', 'Membership Questions', 'Media/Press',
-];
-
-const FAQS = [
-  { q: 'How can I become a member?', a: 'Simply fill out the contact form or visit us during office hours. Membership is free and open to all.' },
-  { q: 'Are events free to attend?', a: 'Most events are free for members. Some special events may have a nominal fee to cover costs.' },
-  { q: 'How can I volunteer?', a: "We're always looking for volunteers! Select 'Volunteer Opportunities' in the form above." },
-  { q: 'Do you offer language classes?', a: 'Yes! We offer Persian language classes for all levels. Check our events page for schedules.' },
-];
-
-const inputClass = 'w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40 transition-all duration-200';
-const labelClass = 'block text-xs font-semibold uppercase tracking-[0.1em] text-gray-500 mb-2';
-
-const CONTACT_METHODS = [
-  {
-    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>,
-    title: 'Call Us', info: SITE_CONFIG.phone, detail: 'Mon – Fri · 10AM – 6PM', action: 'Call Now',
-    link: `tel:${SITE_CONFIG.phone.replace(/\D/g, '')}`,
-  },
-  {
-    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
-    title: 'Email Us', info: SITE_CONFIG.email, detail: 'Response within 24 hours', action: 'Send Email',
-    link: `mailto:${SITE_CONFIG.email}`,
-  },
-  {
-    icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
-    title: 'Visit Us', info: SITE_CONFIG.address, detail: 'See office hours below', action: 'Get Directions',
-    link: '#map',
-  },
-];
-
 export default function ContactClient() {
+  const t = useTranslations('contact');
+  const locale = useLocale();
+  const isFa = locale === 'fa';
+
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const subjects = t.raw('subjects') as string[];
+  const faqItems = t.raw('faqItems') as Array<{ q: string; a: string }>;
 
   useEffect(() => {
     return () => { if (successTimerRef.current) clearTimeout(successTimerRef.current); };
@@ -56,7 +31,7 @@ export default function ContactClient() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, lang: locale }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -65,10 +40,10 @@ export default function ContactClient() {
         if (successTimerRef.current) clearTimeout(successTimerRef.current);
         successTimerRef.current = setTimeout(() => setSubmitted(false), 5000);
       } else {
-        setError(data.error || 'Something went wrong. Please try again.');
+        setError(data.error || t('errorTitle'));
       }
     } catch {
-      setError('Failed to send message. Please check your connection and try again.');
+      setError(t('errorTitle'));
     } finally {
       setLoading(false);
     }
@@ -78,28 +53,50 @@ export default function ContactClient() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const inputClass = 'w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/40 transition-all duration-200';
+  const labelClass = 'block text-xs font-semibold uppercase tracking-[0.1em] text-gray-500 mb-2';
+
+  const contactMethods = [
+    { title: t('callTitle'), info: SITE_CONFIG.phone, detail: t('callDetail'), action: t('callAction'), link: `tel:${SITE_CONFIG.phone.replace(/\D/g, '')}`, icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg> },
+    { title: t('emailTitle'), info: SITE_CONFIG.email, detail: t('emailDetail'), action: t('emailAction'), link: `mailto:${SITE_CONFIG.email}`, icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> },
+    { title: t('visitTitle'), info: SITE_CONFIG.address, detail: t('visitDetail'), action: t('visitAction'), link: '#map', icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
+  ];
+
+  const officeHours = [
+    { day: t('monday'), hours: SITE_CONFIG.officeHours.weekdays, closed: false },
+    { day: t('saturday'), hours: SITE_CONFIG.officeHours.saturday, closed: false },
+    { day: t('sunday'), hours: SITE_CONFIG.officeHours.sunday, closed: true },
+  ];
+
   return (
     <div className="bg-surface">
       <PageHero
         image="/images/contact-hero.jpg"
-        badge="We're Here"
-        title={<>Get in <em className="italic text-accent-muted">Touch</em></>}
-        subtitle="We'd love to hear from you — reach out anytime and we'll respond within 24 hours."
+        badge={t('badge')}
+        title={
+          isFa
+            ? <><span>{t('heroTitle').split(' ')[0]} </span><em className="italic text-accent-muted">{t('heroTitle').split(' ').slice(1).join(' ')}</em></>
+            : <>Get in <em className="italic text-accent-muted">Touch</em></>
+        }
+        subtitle={t('heroSubtitle')}
       />
 
-      {/* ── Contact Methods ────────────────────────────────────────────────── */}
+      {/* Contact Methods */}
       <section className="py-20 bg-surface">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-3 text-accent-dark font-semibold uppercase text-[11px] tracking-[0.2em] mb-4">
-              <span className="w-10 h-px bg-accent" />Reach Out<span className="w-10 h-px bg-accent" />
+              <span className="w-10 h-px bg-accent" />{t('reachOverline')}<span className="w-10 h-px bg-accent" />
             </span>
             <h2 className="font-display font-light text-4xl md:text-5xl text-gray-900">
-              We're Always <em className="italic text-brand-900">Available</em>
+              {isFa
+                ? <><span>همیشه در </span><em className="italic text-brand-900">دسترس</em><span> هستیم</span></>
+                : <>We're Always <em className="italic text-brand-900">Available</em></>
+              }
             </h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-6">
-            {CONTACT_METHODS.map((item) => (
+            {contactMethods.map((item) => (
               <a
                 key={item.title}
                 href={item.link}
@@ -110,7 +107,7 @@ export default function ContactClient() {
                   {item.icon}
                 </div>
                 <h3 className="font-display font-semibold text-xl text-gray-900 mb-1">{item.title}</h3>
-                <p className="text-gray-700 text-sm font-medium mb-1">{item.info}</p>
+                <p className="text-gray-700 text-sm font-medium mb-1" dir="ltr">{item.info}</p>
                 <p className="text-gray-400 text-xs mb-6">{item.detail}</p>
                 <div className="mt-auto flex items-center gap-1.5 text-accent-dark font-semibold text-sm group-hover:gap-3 transition-all duration-200">
                   {item.action}
@@ -122,7 +119,7 @@ export default function ContactClient() {
         </div>
       </section>
 
-      {/* ── Form + Info ────────────────────────────────────────────────────── */}
+      {/* Form + Info */}
       <section className="py-20 bg-surface-alt dot-grid">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="grid lg:grid-cols-5 gap-10 items-start">
@@ -131,15 +128,17 @@ export default function ContactClient() {
             <div className="lg:col-span-3 bg-surface rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="bg-gradient-to-br from-brand-900 via-brand-950 to-brand-950 px-8 py-9 relative overflow-hidden">
                 <div className="absolute -top-10 right-0 w-52 h-36 rounded-full bg-accent/10 blur-[60px] pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-40 h-28 rounded-full bg-brand-400/10 blur-[50px] pointer-events-none" />
                 <div className="relative z-10">
                   <span className="inline-flex items-center gap-3 text-accent/80 font-semibold uppercase text-[11px] tracking-[0.2em] mb-4">
-                    <span className="w-6 h-px bg-accent/50" />Send a Message
+                    <span className="w-6 h-px bg-accent/50" />{t('formOverline')}
                   </span>
                   <h2 className="font-display font-light text-3xl text-white">
-                    We're Here to <em className="italic text-accent-muted">Help</em>
+                    {isFa
+                      ? <><span>اینجاییم تا </span><em className="italic text-accent-muted">کمک کنیم</em></>
+                      : <>We're Here to <em className="italic text-accent-muted">Help</em></>
+                    }
                   </h2>
-                  <p className="text-brand-300 text-sm mt-2">Fill out the form and we'll respond within 24 hours.</p>
+                  <p className="text-brand-300 text-sm mt-2">{t('formSubtitle')}</p>
                 </div>
               </div>
 
@@ -148,47 +147,44 @@ export default function ContactClient() {
                   <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
                     <svg className="w-5 h-5 text-green-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <div>
-                      <p className="font-semibold text-green-800 text-sm">Message Sent Successfully!</p>
-                      <p className="text-green-600 text-xs mt-0.5">Thank you for reaching out. We'll respond shortly.</p>
+                      <p className="font-semibold text-green-800 text-sm">{t('successTitle')}</p>
+                      <p className="text-green-600 text-xs mt-0.5">{t('successBody')}</p>
                     </div>
                   </div>
                 )}
                 {error && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
                     <svg className="w-5 h-5 text-red-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <div>
-                      <p className="font-semibold text-red-800 text-sm">Something went wrong</p>
-                      <p className="text-red-600 text-xs mt-0.5">{error}</p>
-                    </div>
+                    <p className="font-semibold text-red-800 text-sm">{error}</p>
                   </div>
                 )}
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
-                      <label className={labelClass}>Full Name *</label>
-                      <input type="text" name="name" required value={formData.name} onChange={handleChange} className={inputClass} placeholder="Your name" />
+                      <label className={labelClass}>{t('nameLabel')}</label>
+                      <input type="text" name="name" required value={formData.name} onChange={handleChange} className={inputClass} placeholder={t('namePlaceholder')} />
                     </div>
                     <div>
-                      <label className={labelClass}>Email Address *</label>
-                      <input type="email" name="email" required value={formData.email} onChange={handleChange} className={inputClass} placeholder="you@example.com" />
+                      <label className={labelClass}>{t('emailLabel')}</label>
+                      <input type="email" name="email" required value={formData.email} onChange={handleChange} className={inputClass} placeholder={t('emailPlaceholder')} dir="ltr" />
                     </div>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
-                      <label className={labelClass}>Phone Number</label>
-                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} placeholder="(619) 000-0000" />
+                      <label className={labelClass}>{t('phoneLabel')}</label>
+                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} placeholder={t('phonePlaceholder')} dir="ltr" />
                     </div>
                     <div>
-                      <label className={labelClass}>Subject *</label>
+                      <label className={labelClass}>{t('subjectLabel')}</label>
                       <select name="subject" required value={formData.subject} onChange={handleChange} className={inputClass}>
-                        <option value="">Select a topic</option>
-                        {SUBJECTS.map((s) => <option key={s}>{s}</option>)}
+                        <option value="">{t('subjectPlaceholder')}</option>
+                        {subjects.map((s) => <option key={s}>{s}</option>)}
                       </select>
                     </div>
                   </div>
                   <div>
-                    <label className={labelClass}>Message *</label>
-                    <textarea name="message" rows={5} required value={formData.message} onChange={handleChange} className={inputClass} placeholder="Tell us how we can help..." />
+                    <label className={labelClass}>{t('messageLabel')}</label>
+                    <textarea name="message" rows={5} required value={formData.message} onChange={handleChange} className={inputClass} placeholder={t('messagePlaceholder')} />
                   </div>
                   <button
                     type="submit"
@@ -198,18 +194,17 @@ export default function ContactClient() {
                     {loading ? (
                       <span className="flex items-center justify-center gap-2">
                         <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-                        Sending...
+                        {t('submittingBtn')}
                       </span>
-                    ) : 'Send Message →'}
+                    ) : t('submitBtn')}
                   </button>
                 </form>
-                <p className="text-xs text-gray-400 mt-5 text-center">By submitting, you agree to our privacy policy.</p>
+                <p className="text-xs text-gray-400 mt-5 text-center">{t('privacyNote')}</p>
               </div>
             </div>
 
             {/* Info column */}
             <div className="lg:col-span-2 space-y-5">
-
               {/* Map */}
               <div id="map" className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm h-64 relative">
                 <iframe
@@ -222,24 +217,20 @@ export default function ContactClient() {
                 />
               </div>
 
-              {/* Hours + Contact combined */}
+              {/* Hours */}
               <div className="bg-surface rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="px-6 py-4 bg-brand-50 border-b border-gray-100 flex items-center gap-3">
                   <div className="w-8 h-8 bg-brand-900 rounded-lg flex items-center justify-center shrink-0">
                     <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
-                  <h3 className="font-display font-semibold text-gray-900">Office Hours</h3>
+                  <h3 className="font-display font-semibold text-gray-900">{t('hoursTitle')}</h3>
                 </div>
                 <div className="p-6">
                   <div className="space-y-2.5 mb-6">
-                    {[
-                      { day: 'Monday – Friday', hours: SITE_CONFIG.officeHours.weekdays, closed: false },
-                      { day: 'Saturday',        hours: SITE_CONFIG.officeHours.saturday, closed: false },
-                      { day: 'Sunday',          hours: SITE_CONFIG.officeHours.sunday,   closed: true },
-                    ].map(({ day, hours, closed }) => (
+                    {officeHours.map(({ day, hours, closed }) => (
                       <div key={day} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
                         <span className="text-gray-500 text-sm">{day}</span>
-                        <span className={`text-sm font-semibold ${closed ? 'text-accent-dark' : 'text-gray-900'}`}>{hours}</span>
+                        <span className={`text-sm font-semibold font-sans${closed ? ' text-accent-dark' : ' text-gray-900'}`} dir="ltr">{hours}</span>
                       </div>
                     ))}
                   </div>
@@ -248,20 +239,14 @@ export default function ContactClient() {
                       <div className="w-7 h-7 bg-brand-50 group-hover:bg-accent-light rounded-lg flex items-center justify-center shrink-0 transition-colors">
                         <svg className="w-3.5 h-3.5 text-brand-700 group-hover:text-accent-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                       </div>
-                      {SITE_CONFIG.phone}
+                      <span dir="ltr">{SITE_CONFIG.phone}</span>
                     </a>
                     <a href={`mailto:${SITE_CONFIG.email}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-accent-dark transition-colors group break-all">
                       <div className="w-7 h-7 bg-brand-50 group-hover:bg-accent-light rounded-lg flex items-center justify-center shrink-0 transition-colors">
                         <svg className="w-3.5 h-3.5 text-brand-700 group-hover:text-accent-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                       </div>
-                      {SITE_CONFIG.email}
+                      <span dir="ltr">{SITE_CONFIG.email}</span>
                     </a>
-                    <div className="flex items-start gap-3 text-sm text-gray-600">
-                      <div className="w-7 h-7 bg-brand-50 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                        <svg className="w-3.5 h-3.5 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                      </div>
-                      {SITE_CONFIG.address}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -269,17 +254,19 @@ export default function ContactClient() {
               {/* Membership CTA */}
               <div className="bg-gradient-to-br from-brand-900 via-brand-950 to-brand-950 rounded-2xl p-6 text-white relative overflow-hidden">
                 <div className="absolute -top-10 right-0 w-40 h-28 rounded-full bg-accent/10 blur-[50px] pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-32 h-20 rounded-full bg-brand-400/10 blur-[40px] pointer-events-none" />
                 <div className="relative z-10">
                   <span className="inline-flex items-center gap-2 text-accent/80 font-semibold uppercase text-[10px] tracking-[0.2em] mb-3">
-                    <span className="w-4 h-px bg-accent/50" />Membership
+                    <span className="w-4 h-px bg-accent/50" />{t('membershipOverline')}
                   </span>
                   <h3 className="font-display font-light text-2xl text-white mb-2">
-                    Become Part of <em className="italic text-accent-muted">Our Family</em>
+                    {isFa
+                      ? <><span>بخشی از </span><em className="italic text-accent-muted">خانواده ما</em><span> شوید</span></>
+                      : <>Become Part of <em className="italic text-accent-muted">Our Family</em></>
+                    }
                   </h3>
-                  <p className="text-brand-300 text-sm mb-5 leading-relaxed">Join 5,000+ members — membership is free and open to everyone.</p>
+                  <p className="text-brand-300 text-sm mb-5 leading-relaxed">{t('membershipBody')}</p>
                   <Link href="/events" className="btn-shimmer inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent-hover text-brand-950 font-semibold rounded-full text-sm transition-all">
-                    Explore Events
+                    {t('membershipCta')}
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                   </Link>
                 </div>
@@ -289,23 +276,24 @@ export default function ContactClient() {
         </div>
       </section>
 
-      {/* ── FAQs (dark section) ────────────────────────────────────────────── */}
+      {/* FAQs */}
       <section className="py-24 relative overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-950">
         <div className="absolute -top-48 -left-48 w-[700px] h-[700px] rounded-full bg-accent/5 blur-[140px] pointer-events-none" />
-        <div className="absolute -bottom-48 -right-48 w-[600px] h-[600px] rounded-full bg-brand-400/10 blur-[120px] pointer-events-none" />
-
         <div className="container mx-auto px-6 max-w-5xl relative z-10">
           <div className="text-center mb-14">
             <span className="inline-flex items-center gap-3 text-accent/80 font-semibold uppercase text-[11px] tracking-[0.2em] mb-5">
-              <span className="w-10 h-px bg-accent/50" />Quick Answers<span className="w-10 h-px bg-accent/50" />
+              <span className="w-10 h-px bg-accent/50" />{t('faqOverline')}<span className="w-10 h-px bg-accent/50" />
             </span>
             <h2 className="font-display font-light text-4xl md:text-5xl text-white">
-              Frequently Asked <em className="italic text-accent-muted">Questions</em>
+              {isFa
+                ? <><span>سوالات </span><em className="italic text-accent-muted">متداول</em></>
+                : <>Frequently Asked <em className="italic text-accent-muted">Questions</em></>
+              }
             </h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
-            {FAQS.map((faq) => (
+            {faqItems.map((faq) => (
               <div key={faq.q} className="group bg-white/5 backdrop-blur-sm rounded-2xl p-7 border border-white/10 hover:border-accent/30 hover:bg-white/8 transition-all duration-300">
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-8 h-8 bg-accent/15 border border-accent/20 rounded-xl flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-accent/25 transition-colors">
@@ -319,9 +307,9 @@ export default function ContactClient() {
           </div>
 
           <p className="text-center text-brand-400 text-sm mt-10">
-            Still have questions?{' '}
-            <Link href="#" className="text-accent font-semibold hover:text-accent-hover transition-colors">Use the form above</Link>
-            {' '}or call us directly.
+            {t('faqFooter')}{' '}
+            <a href="#" className="text-accent font-semibold hover:text-accent-hover transition-colors">{t('faqFooterLink')}</a>
+            {' '}{t('faqFooterSuffix')}
           </p>
         </div>
       </section>
