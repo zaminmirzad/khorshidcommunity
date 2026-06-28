@@ -63,12 +63,20 @@ export default function Header() {
         </nav>
 
         {/* Desktop CTA */}
-        <Link
-          href="/contact"
-          className="hidden md:inline-block btn-shimmer bg-accent hover:bg-accent-hover text-brand-950 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 shrink-0"
-        >
-          Join Us
-        </Link>
+        <div className="hidden md:flex items-center gap-2 shrink-0">
+          <Link
+            href="/sign-in"
+            className="text-gray-600 hover:text-gray-900 px-4 py-2.5 rounded-full text-sm font-medium transition-colors duration-200"
+          >
+            Sign In
+          </Link>
+          <Link
+            href="/sign-up"
+            className="btn-shimmer bg-accent hover:bg-accent-hover text-brand-950 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200"
+          >
+            Join Us
+          </Link>
+        </div>
 
         {/* Mobile hamburger */}
         <button
@@ -94,13 +102,22 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/contact"
-            onClick={() => setIsOpen(false)}
-            className="mt-2 block text-center bg-accent hover:bg-accent-hover text-brand-950 px-6 py-3.5 rounded-full text-base font-semibold transition-colors"
-          >
-            Join Our Community
-          </Link>
+          <div className="mt-2 flex flex-col gap-2">
+            <Link
+              href="/sign-in"
+              onClick={() => setIsOpen(false)}
+              className="block text-center border border-gray-200 text-gray-700 px-6 py-3.5 rounded-full text-base font-medium hover:bg-gray-50 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/sign-up"
+              onClick={() => setIsOpen(false)}
+              className="block text-center bg-accent hover:bg-accent-hover text-brand-950 px-6 py-3.5 rounded-full text-base font-semibold transition-colors"
+            >
+              Join Our Community
+            </Link>
+          </div>
         </div>
       )}
 
