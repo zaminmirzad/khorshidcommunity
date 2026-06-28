@@ -13,7 +13,7 @@ const EN_LABELS: NewsletterLabels = {
   placeholder: 'Your email address',
   submit: 'Subscribe',
   submitting: 'Subscribing...',
-  success: "✅ You're subscribed! Thank you.",
+  success: "You're subscribed! Thank you.",
   error: 'Something went wrong. Please try again.',
 };
 
@@ -53,12 +53,12 @@ export default function NewsletterForm({ lang, labels = EN_LABELS, inputClassNam
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className={`flex-1 px-6 py-3 rounded-xl border-0 focus:ring-2 focus:ring-yellow-500 outline-none ${inputClassName ?? ''}`}
+          className={`flex-1 px-6 py-3 rounded-xl border-0 focus:ring-2 focus:ring-accent outline-none ${inputClassName ?? ''}`}
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="px-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-semibold rounded-xl transition-all disabled:opacity-70"
+          className="btn-shimmer px-8 py-3 bg-accent hover:bg-accent-hover text-brand-950 font-semibold rounded-xl transition-all disabled:opacity-70"
         >
           {status === 'loading' ? labels.submitting : labels.submit}
         </button>

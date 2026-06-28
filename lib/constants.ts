@@ -15,8 +15,4 @@ export const SITE_CONFIG = {
 } as const;
 
 export const SOCIAL_LINKS: SocialLink[] = [
-  { name: 'Instagram', href: 'https://www.instagram.com/khorshidcommunity', icon: '📷' },
-  { name: 'Facebook', href: 'https://www.facebook.com/khorshidcommunity', icon: '📘' },
-  { name: 'YouTube', href: 'https://www.youtube.com/@khorshidcommunity', icon: '▶️' },
-  { name: 'Twitter', href: 'https://twitter.com/khorshidcommunity', icon: '🔗' },
 ];

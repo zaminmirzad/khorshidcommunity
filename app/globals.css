@@ -2,32 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ════════════════════════════════════════════════════════════════════════
+   THEME TOKENS — edit these to change the entire site's color scheme
+   ════════════════════════════════════════════════════════════════════════
+
+   Active: Bright Navy (Blue)
+
+   Warm Charcoal (Stone):
+     --brand-50: 250 250 249  --brand-100: 245 245 244  --brand-200: 231 229 228
+     --brand-300: 214 211 209  --brand-400: 168 162 158  --brand-500: 120 113 108
+     --brand-600: 87 83 78  --brand-700: 68 64 60  --brand-800: 41 37 36
+     --brand-900: 28 25 23  --brand-950: 12 10 9
+
+   Original Navy (Blue):
+     --brand-50: 239 246 255  --brand-100: 219 234 254  --brand-200: 191 219 254
+     --brand-300: 147 197 253  --brand-400: 96 165 250  --brand-500: 59 130 246
+     --brand-600: 37 99 235  --brand-700: 29 78 216  --brand-800: 30 64 148
+     --brand-900: 30 58 138  --brand-950: 23 37 84
+
+   Forest Green:
+     --brand-50: 240 253 244  --brand-900: 20 83 45  --brand-950: 5 46 22  (etc.)
+
+   ════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* ── Brand (primary dark) ──── Bright Navy / Blue ─────────────────── */
+  --brand-50:  239 246 255;
+  --brand-100: 219 234 254;
+  --brand-200: 191 219 254;
+  --brand-300: 147 197 253;
+  --brand-400: 96  165 250;
+  --brand-500: 59  130 246;
+  --brand-600: 37  99  235;
+  --brand-700: 29  78  216;
+  --brand-800: 30  64  148;
+  --brand-900: 30  58  138;
+  --brand-950: 23  37  84;
+
+  /* ── Accent (gold highlight) ─── Amber ────────────────────────────── */
+  --accent-light: 254 243 199;   /* amber-100  */
+  --accent-muted: 252 211 77;    /* amber-300  */
+  --accent:       251 191 36;    /* amber-400  */
+  --accent-hover: 245 158 11;    /* amber-500  */
+  --accent-dark:  217 119 22;    /* amber-600  */
+  --accent-text:  146 64  14;    /* amber-800  */
+
+  /* ── Surfaces (page backgrounds) ─────────────────────────────────── */
+  --surface:     255 255 255;   /* white      */
+  --surface-alt: 250 248 244;   /* cream      */
+}
+
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
+  body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
-  body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* Premium text selection */
   ::selection {
-    background: #fef3c7;
-    color: #1e3a8a;
+    background: rgb(var(--accent-light));
+    color: rgb(var(--brand-950));
   }
 
-  /* Thin branded scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: #f1f5f9; }
-  ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: #d97706; }
+  ::-webkit-scrollbar-thumb { background: rgb(var(--brand-700)); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--accent-dark)); }
 
-  /* Section divider wave utility */
-  .wave-bottom {
-    position: relative;
-  }
+  /* Wave section divider utility */
+  .wave-bottom { position: relative; }
   .wave-bottom::after {
     content: '';
     position: absolute;
@@ -35,25 +74,16 @@
     left: 0;
     width: 100%;
     height: 60px;
-    background: white;
+    background: rgb(var(--surface));
     clip-path: ellipse(55% 100% at 50% 100%);
   }
-
-  .wave-bottom-cream::after {
-    background: #faf8f4;
-  }
-
-  .wave-bottom-dark::after {
-    background: #0f172a;
-  }
+  .wave-bottom-alt::after   { background: rgb(var(--surface-alt)); }
+  .wave-bottom-brand::after { background: rgb(var(--brand-950)); }
 }
 
 @layer utilities {
-  /* Shimmer button effect */
-  .btn-shimmer {
-    position: relative;
-    overflow: hidden;
-  }
+  /* Shimmer sweep on hover */
+  .btn-shimmer { position: relative; overflow: hidden; }
   .btn-shimmer::after {
     content: '';
     position: absolute;
@@ -64,15 +94,10 @@
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
     transition: left 0.5s ease;
   }
-  .btn-shimmer:hover::after {
-    left: 150%;
-  }
+  .btn-shimmer:hover::after { left: 150%; }
 
   /* Gold underline accent on headings */
-  .heading-accent {
-    position: relative;
-    display: inline-block;
-  }
+  .heading-accent { position: relative; display: inline-block; }
   .heading-accent::after {
     content: '';
     position: absolute;
@@ -80,7 +105,7 @@
     left: 0;
     width: 2.5rem;
     height: 2px;
-    background: #d97706;
+    background: rgb(var(--accent-dark));
     border-radius: 999px;
   }
 
