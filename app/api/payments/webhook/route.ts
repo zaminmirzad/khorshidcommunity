@@ -19,16 +19,25 @@ export async function POST(request: Request) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { member_id } = session.metadata ?? {};
+    const { member_id, product_id, stripe_price_id } = session.metadata ?? {};
 
     if (member_id && session.amount_total) {
       const adminClient = createAdminClient();
+
+      const { data: product } = await adminClient
+        .from('products')
+        .select('name')
+        .eq('id', product_id)
+        .single();
+
       await adminClient.from('payments').insert({
         member_id,
+        product_id: product_id ?? null,
         stripe_session_id: session.id,
+        stripe_price_id: stripe_price_id ?? null,
         amount: session.amount_total,
         currency: session.currency ?? 'usd',
-        description: 'Annual Membership',
+        description: product?.name ?? 'Payment',
         status: 'paid',
         paid_at: new Date().toISOString(),
       });
