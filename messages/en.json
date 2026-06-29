@@ -229,5 +229,25 @@
     "backToTop": "Back to top",
     "quote": "Uniting hearts, preserving heritage, building futures.",
     "serving": "Serving the Hazara and Persian community in San Diego since {year}."
+  },
+  "join": {
+    "badge": "Membership",
+    "title": "Join Our Community",
+    "subtitle": "Membership is by invitation. Submit your details and our team will review your request — approved members receive an email invite to complete registration.",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Your full name",
+    "email": "Email Address",
+    "emailPlaceholder": "you@example.com",
+    "phone": "Phone Number",
+    "phoneOptional": "Optional",
+    "phonePlaceholder": "+1 (619) 000-0000",
+    "message": "Why do you want to join?",
+    "messagePlaceholder": "Tell us a bit about yourself and your connection to the Hazara or Persian community...",
+    "submit": "Submit Request",
+    "submitting": "Submitting...",
+    "successTitle": "Request Received!",
+    "successBody": "Thank you for your interest in Khorshid Community. We'll review your request and reach out within a few days.",
+    "successBack": "Back to home",
+    "error": "Something went wrong. Please try again."
   }
 }

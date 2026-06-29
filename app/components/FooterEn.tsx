@@ -43,7 +43,7 @@ export default async function Footer() {
             <p className="text-brand-400 text-sm mt-2">{t('ctaSubtitle')}</p>
           </div>
           <div className="flex gap-3 shrink-0">
-            <Link href="/contact" className="btn-shimmer inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover text-brand-950 font-semibold rounded-full transition-all duration-300 text-sm whitespace-nowrap">
+            <Link href="/join" className="btn-shimmer inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover text-brand-950 font-semibold rounded-full transition-all duration-300 text-sm whitespace-nowrap">
               {t('getInvolved')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </Link>

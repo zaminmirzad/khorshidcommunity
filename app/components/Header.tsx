@@ -101,9 +101,9 @@ export default function Header() {
           <NextLink href="/sign-in" className="text-gray-600 hover:text-gray-900 px-4 py-2.5 rounded-full text-sm font-medium transition-colors duration-200">
             {t('signIn')}
           </NextLink>
-          <NextLink href="/sign-up" className="btn-shimmer bg-accent hover:bg-accent-hover text-brand-950 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200">
+          <Link href="/join" className="btn-shimmer bg-accent hover:bg-accent-hover text-brand-950 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200">
             {t('joinUs')}
-          </NextLink>
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -148,9 +148,9 @@ export default function Header() {
             <NextLink href="/sign-in" onClick={() => setIsOpen(false)} className="block text-center border border-gray-200 text-gray-700 px-6 py-3.5 rounded-full text-base font-medium hover:bg-gray-50 transition-colors">
               {t('signIn')}
             </NextLink>
-            <NextLink href="/sign-up" onClick={() => setIsOpen(false)} className="block text-center bg-accent hover:bg-accent-hover text-brand-950 px-6 py-3.5 rounded-full text-base font-semibold transition-colors">
+            <Link href="/join" onClick={() => setIsOpen(false)} className="block text-center bg-accent hover:bg-accent-hover text-brand-950 px-6 py-3.5 rounded-full text-base font-semibold transition-colors">
               {t('joinCommunity')}
-            </NextLink>
+            </Link>
           </div>
         </div>
       )}
