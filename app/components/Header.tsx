@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import NextLink from 'next/link';
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
@@ -49,7 +50,7 @@ export default function Header() {
           : 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05)]'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center${locale === 'fa' ? ' font-persian' : ''}`}>
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 shrink-0">
@@ -97,12 +98,12 @@ export default function Header() {
               فا
             </button>
           </div>
-          <Link href="/sign-in" className="text-gray-600 hover:text-gray-900 px-4 py-2.5 rounded-full text-sm font-medium transition-colors duration-200">
+          <NextLink href="/sign-in" className="text-gray-600 hover:text-gray-900 px-4 py-2.5 rounded-full text-sm font-medium transition-colors duration-200">
             {t('signIn')}
-          </Link>
-          <Link href="/sign-up" className="btn-shimmer bg-accent hover:bg-accent-hover text-brand-950 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200">
+          </NextLink>
+          <NextLink href="/sign-up" className="btn-shimmer bg-accent hover:bg-accent-hover text-brand-950 px-5 lg:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200">
             {t('joinUs')}
-          </Link>
+          </NextLink>
         </div>
 
         {/* Mobile hamburger */}
@@ -118,7 +119,7 @@ export default function Header() {
 
       {/* Mobile dropdown */}
       {isOpen && (
-        <div className="md:hidden flex flex-col gap-1 px-4 pb-6 pt-2 bg-white border-t border-gray-100 animate-[slideDown_0.25s_ease]">
+        <div className={`md:hidden flex flex-col gap-1 px-4 pb-6 pt-2 bg-white border-t border-gray-100 animate-[slideDown_0.25s_ease]${locale === 'fa' ? ' font-persian' : ''}`}>
           {NAV_KEYS.map((link) => (
             <Link
               key={link.href}
@@ -144,12 +145,12 @@ export default function Header() {
             </button>
           </div>
           <div className="mt-2 flex flex-col gap-2">
-            <Link href="/sign-in" onClick={() => setIsOpen(false)} className="block text-center border border-gray-200 text-gray-700 px-6 py-3.5 rounded-full text-base font-medium hover:bg-gray-50 transition-colors">
+            <NextLink href="/sign-in" onClick={() => setIsOpen(false)} className="block text-center border border-gray-200 text-gray-700 px-6 py-3.5 rounded-full text-base font-medium hover:bg-gray-50 transition-colors">
               {t('signIn')}
-            </Link>
-            <Link href="/sign-up" onClick={() => setIsOpen(false)} className="block text-center bg-accent hover:bg-accent-hover text-brand-950 px-6 py-3.5 rounded-full text-base font-semibold transition-colors">
+            </NextLink>
+            <NextLink href="/sign-up" onClick={() => setIsOpen(false)} className="block text-center bg-accent hover:bg-accent-hover text-brand-950 px-6 py-3.5 rounded-full text-base font-semibold transition-colors">
               {t('joinCommunity')}
-            </Link>
+            </NextLink>
           </div>
         </div>
       )}

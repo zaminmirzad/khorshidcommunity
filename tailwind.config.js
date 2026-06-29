@@ -9,9 +9,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['var(--font-display)', 'Georgia', 'serif'],
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        persian: ['var(--font-persian)', 'Noto Naskh Arabic', 'serif'],
+        display: ['var(--font-display)', 'var(--font-persian)', 'Georgia', 'serif'],
+        sans: ['var(--font-sans)', 'var(--font-persian)', 'system-ui', 'sans-serif'],
+        persian: ['var(--font-persian)', 'Vazirmatn', 'sans-serif'],
       },
 
       colors: {

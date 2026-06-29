@@ -5,6 +5,6 @@ export const proxy = createMiddleware(routing);
 
 export const config = {
   matcher: [
-    '/((?!api|_next|images|favicon\\.ico|logo\\.jpg|.*\\..*).*)',
+    '/((?!api|_next|images|favicon\\.ico|logo\\.jpg|sign-in|sign-up|admin|dashboard|.*\\..*).*)',
   ],
 };

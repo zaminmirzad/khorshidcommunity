@@ -20,9 +20,18 @@
     "heroSubtitle": "Keeping Our Culture Alive, Uniting Generations, Building a Vibrant Future",
     "heroBody": "Join 5,000+ members celebrating Hazara and Persian heritage through cultural events, educational programs, and community support in San Diego.",
     "heroStats": [
-      { "value": "5,200+", "label": "Lives Impacted" },
-      { "value": "48", "label": "Annual Events" },
-      { "value": "350+", "label": "Volunteers" }
+      {
+        "value": "5,200+",
+        "label": "Lives Impacted"
+      },
+      {
+        "value": "48",
+        "label": "Annual Events"
+      },
+      {
+        "value": "350+",
+        "label": "Volunteers"
+      }
     ],
     "missionOverline": "Our Purpose",
     "missionTitle": "One Community. One Family. One Future.",
@@ -93,10 +102,22 @@
     "archivesOverline": "Our Archives",
     "archivesTitle": "Memories in Numbers",
     "galleryStats": [
-      { "number": "500+", "label": "Photos Captured" },
-      { "number": "48+", "label": "Events Covered" },
-      { "number": "15", "label": "Years of Memories" },
-      { "number": "1000+", "label": "Happy Faces" }
+      {
+        "number": "500+",
+        "label": "Photos Captured"
+      },
+      {
+        "number": "48+",
+        "label": "Events Covered"
+      },
+      {
+        "number": "15",
+        "label": "Years of Memories"
+      },
+      {
+        "number": "1000+",
+        "label": "Happy Faces"
+      }
     ],
     "browseOverline": "Browse by Category",
     "browseTitle": "Explore the Gallery",
@@ -164,10 +185,22 @@
     "faqOverline": "Quick Answers",
     "faqTitle": "Frequently Asked Questions",
     "faqItems": [
-      { "q": "How can I become a member?", "a": "Simply fill out the contact form or visit us during office hours. Membership is free and open to all." },
-      { "q": "Are events free to attend?", "a": "Most events are free for members. Some special events may have a nominal fee to cover costs." },
-      { "q": "How can I volunteer?", "a": "We're always looking for volunteers! Select 'Volunteer Opportunities' in the form above." },
-      { "q": "Do you offer language classes?", "a": "Yes! We offer Persian language classes for all levels. Check our events page for schedules." }
+      {
+        "q": "How can I become a member?",
+        "a": "Simply fill out the contact form or visit us during office hours. Membership is free and open to all."
+      },
+      {
+        "q": "Are events free to attend?",
+        "a": "Most events are free for members. Some special events may have a nominal fee to cover costs."
+      },
+      {
+        "q": "How can I volunteer?",
+        "a": "We're always looking for volunteers! Select 'Volunteer Opportunities' in the form above."
+      },
+      {
+        "q": "Do you offer language classes?",
+        "a": "Yes! We offer Persian language classes for all levels. Check our events page for schedules."
+      }
     ],
     "faqFooter": "Still have questions?",
     "faqFooterLink": "Use the form above",
@@ -176,5 +209,25 @@
     "membershipTitle": "Become Part of Our Family",
     "membershipBody": "Join 5,000+ members — membership is free and open to everyone.",
     "membershipCta": "Explore Events"
+  },
+  "footer": {
+    "ctaTitle": "Ready to be part of ",
+    "ctaAccent": "our story?",
+    "ctaSubtitle": "Join 5,000+ members celebrating Hazara and Persian heritage.",
+    "getInvolved": "Get Involved",
+    "viewEvents": "View Events",
+    "exploreSection": "Explore",
+    "contactSection": "Contact",
+    "hoursSection": "Office Hours",
+    "weekdays": "Mon – Fri",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "nonprofit": "501(c)(3) Nonprofit",
+    "registered": "Registered",
+    "copyright": "All rights reserved.",
+    "tagline": "Built with care for our community.",
+    "backToTop": "Back to top",
+    "quote": "Uniting hearts, preserving heritage, building futures.",
+    "serving": "Serving the Hazara and Persian community in San Diego since {year}."
   }
 }

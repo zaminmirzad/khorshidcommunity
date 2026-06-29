@@ -1,4 +1,4 @@
-import { Cormorant_Garamond, Inter, Noto_Naskh_Arabic } from 'next/font/google';
+import { Cormorant_Garamond, Inter, Vazirmatn } from 'next/font/google';
 import './globals.css';
 
 const cormorant = Cormorant_Garamond({
@@ -15,9 +15,9 @@ const inter = Inter({
   display: 'swap',
 });
 
-const notoNaskhArabic = Noto_Naskh_Arabic({
+const vazirmatn = Vazirmatn({
   subsets: ['arabic'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-persian',
   display: 'swap',
 });
@@ -67,7 +67,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable} ${notoNaskhArabic.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${cormorant.variable} ${inter.variable} ${vazirmatn.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
         {children}
       </body>

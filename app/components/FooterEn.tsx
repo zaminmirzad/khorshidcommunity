@@ -1,12 +1,34 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import { NAV_LINKS } from '@/lib/nav';
+import { getTranslations, getLocale } from 'next-intl/server';
+import { Link } from '@/i18n/navigation';
 import { SITE_CONFIG, SOCIAL_LINKS } from '@/lib/constants';
 import SocialIcon from './SocialIcon';
 
-export default function FooterEn() {
+const NAV_KEYS = [
+  { key: 'home' as const, href: '/' },
+  { key: 'events' as const, href: '/events' },
+  { key: 'about' as const, href: '/about' },
+  { key: 'gallery' as const, href: '/gallery' },
+  { key: 'contact' as const, href: '/contact' },
+];
+
+export default async function Footer() {
+  const locale = await getLocale();
+  const t = await getTranslations('footer');
+  const tNav = await getTranslations('nav');
+  const isRTL = locale === 'fa';
+
+  const hours = [
+    { day: t('weekdays'), hours: SITE_CONFIG.officeHours.weekdays },
+    { day: t('saturday'), hours: SITE_CONFIG.officeHours.saturday },
+    { day: t('sunday'),   hours: SITE_CONFIG.officeHours.sunday },
+  ];
+
   return (
-    <footer className="bg-gradient-to-b from-brand-950 via-brand-950 to-[#0a1228] text-brand-400 relative overflow-hidden">
+    <footer
+      dir={isRTL ? 'rtl' : 'ltr'}
+      className={`bg-gradient-to-b from-brand-950 via-brand-950 to-[#0a1228] text-brand-400 relative overflow-hidden${isRTL ? ' font-persian' : ''}`}
+    >
       {/* Glow orbs */}
       <div className="absolute top-0 left-1/4 w-[800px] h-56 rounded-full bg-brand-400/8 blur-[140px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[600px] h-48 rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
@@ -16,17 +38,17 @@ export default function FooterEn() {
         <div className="max-w-7xl mx-auto px-6 py-14 flex flex-col md:flex-row items-center justify-between gap-8">
           <div>
             <p className="font-display font-light italic text-3xl md:text-4xl text-white leading-snug">
-              Ready to be part of <em className="text-accent-muted not-italic">our story?</em>
+              {t('ctaTitle')}<em className="text-accent-muted not-italic">{t('ctaAccent')}</em>
             </p>
-            <p className="text-brand-400 text-sm mt-2">Join 5,000+ members celebrating Hazara and Persian heritage.</p>
+            <p className="text-brand-400 text-sm mt-2">{t('ctaSubtitle')}</p>
           </div>
           <div className="flex gap-3 shrink-0">
             <Link href="/contact" className="btn-shimmer inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover text-brand-950 font-semibold rounded-full transition-all duration-300 text-sm whitespace-nowrap">
-              Get Involved
+              {t('getInvolved')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </Link>
             <Link href="/events" className="inline-flex items-center px-6 py-3 rounded-full border border-white/20 hover:border-accent/40 hover:text-accent text-white text-sm font-semibold transition-all duration-300 whitespace-nowrap">
-              View Events
+              {t('viewEvents')}
             </Link>
           </div>
         </div>
@@ -57,15 +79,15 @@ export default function FooterEn() {
             <div className="w-8 h-px bg-accent/50 mb-4" />
 
             <p className="font-display font-light italic text-brand-300 text-base leading-relaxed mb-4">
-              "Uniting hearts, preserving heritage,<br className="hidden sm:block" /> building futures."
+              "{t('quote')}"
             </p>
             <p className="text-sm leading-relaxed text-brand-500">
-              Serving the Hazara and Persian community in San Diego since {SITE_CONFIG.foundingYear}.
+              {t('serving', { year: SITE_CONFIG.foundingYear })}
             </p>
 
             <div className="flex items-center gap-2 mt-5">
               <span className="px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-accent text-[10px] font-semibold tracking-wide uppercase">
-                501(c)(3) Nonprofit
+                {t('nonprofit')}
               </span>
             </div>
 
@@ -91,17 +113,17 @@ export default function FooterEn() {
           <div>
             <div className="flex items-center gap-2.5 mb-6">
               <span className="w-5 h-0.5 bg-accent rounded-full" />
-              <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">Explore</h4>
+              <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">{t('exploreSection')}</h4>
             </div>
             <ul className="space-y-3">
-              {NAV_LINKS.map((link) => (
+              {NAV_KEYS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     className="text-sm text-brand-400 hover:text-accent transition-colors duration-200 flex items-center gap-2 group"
                   >
                     <span className="w-3 h-px bg-brand-700 group-hover:bg-accent group-hover:w-5 transition-all duration-200" />
-                    {link.label}
+                    {tNav(link.key)}
                   </Link>
                 </li>
               ))}
@@ -112,7 +134,7 @@ export default function FooterEn() {
           <div>
             <div className="flex items-center gap-2.5 mb-6">
               <span className="w-5 h-0.5 bg-accent rounded-full" />
-              <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">Contact</h4>
+              <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">{t('contactSection')}</h4>
             </div>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3 text-brand-400">
@@ -145,17 +167,13 @@ export default function FooterEn() {
           <div>
             <div className="flex items-center gap-2.5 mb-6">
               <span className="w-5 h-0.5 bg-accent rounded-full" />
-              <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">Office Hours</h4>
+              <h4 className="text-white text-xs font-semibold uppercase tracking-[0.15em]">{t('hoursSection')}</h4>
             </div>
             <ul className="text-sm space-y-3">
-              {[
-                { day: 'Mon – Fri', hours: SITE_CONFIG.officeHours.weekdays },
-                { day: 'Saturday', hours: SITE_CONFIG.officeHours.saturday },
-                { day: 'Sunday',   hours: SITE_CONFIG.officeHours.sunday },
-              ].map(({ day, hours }) => (
+              {hours.map(({ day, hours: h }) => (
                 <li key={day} className="flex justify-between items-center border-b border-white/5 pb-3 last:border-0 last:pb-0">
                   <span className="text-brand-500">{day}</span>
-                  <span className="text-brand-200 font-medium">{hours}</span>
+                  <span className="text-brand-200 font-medium">{h}</span>
                 </li>
               ))}
             </ul>
@@ -166,7 +184,7 @@ export default function FooterEn() {
                 </svg>
               </div>
               <div>
-                <p className="text-[10px] text-brand-500 uppercase tracking-wider">Registered</p>
+                <p className="text-[10px] text-brand-500 uppercase tracking-wider">{t('registered')}</p>
                 <p className="text-xs text-accent font-semibold">{SITE_CONFIG.name}</p>
               </div>
             </div>
@@ -176,22 +194,22 @@ export default function FooterEn() {
         {/* ── Bottom bar ──────────────────────────────────────────────────── */}
         <div className="border-t border-white/8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-brand-600">
-            © {new Date().getFullYear()} {SITE_CONFIG.name}. All rights reserved.
+            © {new Date().getFullYear()} {SITE_CONFIG.name}. {t('copyright')}
           </p>
           <div className="flex items-center gap-3">
             <span className="w-1 h-1 rounded-full bg-accent/40" />
-            <span className="text-xs text-brand-600 italic font-display">Built with care for our community.</span>
+            <span className="text-xs text-brand-600 italic font-display">{t('tagline')}</span>
             <span className="w-1 h-1 rounded-full bg-accent/40" />
           </div>
           <a
             href="#top"
-            aria-label="Back to top"
+            aria-label={t('backToTop')}
             className="group flex items-center gap-2 text-xs text-brand-500 hover:text-accent transition-colors duration-200"
           >
             <svg className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
             </svg>
-            Back to top
+            {t('backToTop')}
           </a>
         </div>
       </div>

@@ -115,3 +115,9 @@
     background-size: 24px 24px;
   }
 }
+
+/* Force Vazirmatn for all text inside RTL (Farsi) sections */
+[dir="rtl"],
+[dir="rtl"] * {
+  font-family: var(--font-persian), 'Vazirmatn', sans-serif !important;
+}
