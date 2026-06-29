@@ -18,9 +18,10 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<typeof FILTERS[number]>('All');
+  const [changing, setChanging] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetch() {
+    async function load() {
       const supabase = createClient();
       const { data } = await supabase
         .from('members')
@@ -29,8 +30,27 @@ export default function MembersPage() {
       setMembers(data ?? []);
       setLoading(false);
     }
-    fetch();
+    load();
   }, []);
+
+  async function changeRole(member: Member, newRole: 'admin' | 'member') {
+    if (member.role === newRole) return;
+    const action = newRole === 'admin' ? 'promote' : 'demote';
+    if (!confirm(`${action === 'promote' ? 'Promote' : 'Demote'} ${member.full_name} to ${newRole}?`)) return;
+    setChanging(member.id);
+    const res = await fetch(`/api/admin/members/${member.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: newRole }),
+    });
+    if (res.ok) {
+      setMembers((prev) => prev.map((m) => m.id === member.id ? { ...m, role: newRole } : m));
+    } else {
+      const { error } = await res.json();
+      alert(error ?? 'Failed to change role.');
+    }
+    setChanging(null);
+  }
 
   const filtered = members.filter((m) => {
     const matchesSearch = m.full_name.toLowerCase().includes(search.toLowerCase()) || m.email.toLowerCase().includes(search.toLowerCase());
@@ -128,7 +148,10 @@ export default function MembersPage() {
                         <div className="w-9 h-9 rounded-full bg-brand-50 dark:bg-brand-950/50 border border-brand-100 dark:border-brand-900/50 flex items-center justify-center shrink-0">
                           <span className="font-display text-sm font-semibold text-brand-700 dark:text-brand-300">{m.full_name[0]}</span>
                         </div>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{m.full_name}</span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{m.full_name}</p>
+                          {m.phone && <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{m.phone}</p>}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-3.5 hidden md:table-cell">
@@ -140,9 +163,28 @@ export default function MembersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-3.5">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${m.role === 'admin' ? 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' : 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400'}`}>
-                        {m.role}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${m.role === 'admin' ? 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' : 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400'}`}>
+                          {m.role}
+                        </span>
+                        {changing === m.id ? (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">Saving…</span>
+                        ) : m.role === 'member' ? (
+                          <button
+                            onClick={() => changeRole(m, 'admin')}
+                            className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-red-300 dark:hover:border-red-700 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
+                          >
+                            Make Admin
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => changeRole(m, 'member')}
+                            className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+                          >
+                            Demote
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

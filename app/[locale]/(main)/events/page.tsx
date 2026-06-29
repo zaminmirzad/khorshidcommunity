@@ -5,6 +5,7 @@ import { getTranslations } from 'next-intl/server';
 import PageHero from '@/app/components/PageHero';
 import { EVENTS } from '@/lib/data/events';
 import { SITE_CONFIG } from '@/lib/constants';
+import { createClient } from '@/lib/supabase/server';
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -13,31 +14,29 @@ const FA_TYPE_LABELS: Record<string, string> = {
   Workshop: 'کارگاه',
   Class: 'کلاس',
   Community: 'کمیونیتی',
+  Cultural: 'فرهنگی',
   Sports: 'ورزشی',
   Sport: 'ورزشی',
 };
 
-const eventsJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  itemListElement: EVENTS
-    .filter((e) => e.schemaDate)
-    .map((event, i) => ({
-      '@type': 'Event',
-      position: i + 1,
-      name: event.title,
-      startDate: event.schemaDate,
-      location: {
-        '@type': 'Place',
-        name: event.location,
-        address: { '@type': 'PostalAddress', addressLocality: 'San Diego', addressRegion: 'CA' },
-      },
-      organizer: { '@type': 'Organization', name: SITE_CONFIG.name, url: SITE_CONFIG.url },
-      description: event.description,
-      eventStatus: 'https://schema.org/EventScheduled',
-      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-      image: `${SITE_CONFIG.url}${event.image}`,
-    })),
+const DEFAULT_IMAGES = [
+  '/images/nowruz-festival.jpg',
+  '/images/hazara-culture-day.jpg',
+  '/images/eid-celebration.jpg',
+];
+
+type DisplayEvent = {
+  id: string | number;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  type: string;
+  image: string;
+  alt: string;
+  schemaDate: string | null;
+  is_free: boolean;
 };
 
 export default async function EventsPage({ params }: Props) {
@@ -45,10 +44,62 @@ export default async function EventsPage({ params }: Props) {
   const t = await getTranslations('events');
   const isFa = locale === 'fa';
 
+  const supabase = await createClient();
+  const { data: dbEvents } = await supabase
+    .from('events')
+    .select('id, title, description, date, location, is_free, active')
+    .eq('active', true)
+    .gte('date', new Date().toISOString())
+    .order('date', { ascending: true });
+
+  let events: DisplayEvent[];
+  if (dbEvents && dbEvents.length > 0) {
+    events = dbEvents.map((e, i) => {
+      const d = new Date(e.date);
+      return {
+        id: e.id,
+        title: e.title,
+        description: e.description ?? '',
+        date: d.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }),
+        time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        location: e.location ?? 'TBD',
+        type: 'Community',
+        image: DEFAULT_IMAGES[i % DEFAULT_IMAGES.length],
+        alt: e.title,
+        schemaDate: e.date,
+        is_free: e.is_free,
+      };
+    });
+  } else {
+    events = EVENTS.map((e) => ({ ...e, id: e.id, is_free: true, schemaDate: e.schemaDate }));
+  }
+
+  const eventsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: events
+      .filter((e) => e.schemaDate)
+      .map((event, i) => ({
+        '@type': 'Event',
+        position: i + 1,
+        name: event.title,
+        startDate: event.schemaDate,
+        location: {
+          '@type': 'Place',
+          name: event.location,
+          address: { '@type': 'PostalAddress', addressLocality: 'San Diego', addressRegion: 'CA' },
+        },
+        organizer: { '@type': 'Organization', name: SITE_CONFIG.name, url: SITE_CONFIG.url },
+        description: event.description,
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        image: `${SITE_CONFIG.url}${event.image}`,
+      })),
+  };
+
   return (
     <>
       <Script id="json-ld-events-page" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }} />
-
       <PageHero
         image="/images/nowruz-festival.jpg"
         badge={t('badge')}
@@ -72,7 +123,7 @@ export default async function EventsPage({ params }: Props) {
 
         <div className="container mx-auto px-6 py-20">
           <div className="space-y-6 max-w-5xl mx-auto">
-            {EVENTS.map((event, i) => {
+            {events.map((event, i) => {
               const typeLabel = isFa ? (FA_TYPE_LABELS[event.type] ?? event.type) : event.type;
               const rsvpLabel = event.type === 'Sports' ? t('joinMatch') : t('rsvpNow');
               return (
@@ -113,7 +164,7 @@ export default async function EventsPage({ params }: Props) {
                         {rsvpLabel}
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                       </Link>
-                      <span className="text-gray-300 text-sm">{t('freeForMembers')}</span>
+                      {event.is_free && <span className="text-gray-300 text-sm">{t('freeForMembers')}</span>}
                     </div>
                   </div>
                 </article>

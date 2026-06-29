@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { getTranslations } from 'next-intl/server';
 import { FEATURED_EVENTS } from '@/lib/data/events';
 import { SITE_CONFIG } from '@/lib/constants';
+import { createClient } from '@/lib/supabase/server';
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -79,12 +80,36 @@ export default async function Home({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations('home');
   const isFa = locale === 'fa';
-
-  const programs = isFa ? FA_PROGRAMS : EN_PROGRAMS;
-  const stats = isFa ? FA_STATS : EN_STATS;
-  const testimonials = isFa ? FA_TESTIMONIALS : EN_TESTIMONIALS;
-  const news = isFa ? FA_NEWS : EN_NEWS;
   const heroStats = t.raw('heroStats') as Array<{ value: string; label: string }>;
+
+  const supabase = await createClient();
+  const [{ data: dbStats }, { data: dbPrograms }, { data: dbTestimonials }, { data: dbNews }] = await Promise.all([
+    supabase.from('site_stats').select('*').order('sort_order'),
+    supabase.from('programs').select('*').eq('active', true).order('sort_order'),
+    supabase.from('testimonials').select('*').eq('active', true).order('sort_order'),
+    supabase.from('announcements').select('id, title, body, created_at').eq('active', true).order('created_at', { ascending: false }).limit(3),
+  ]);
+
+  const stats = (dbStats && dbStats.length > 0)
+    ? dbStats.map((s: { id: string; number: string; label_en: string; label_fa: string | null; icon: string }) => ({ id: s.id, number: s.number, label: isFa ? (s.label_fa ?? s.label_en) : s.label_en, icon: s.icon }))
+    : (isFa ? FA_STATS : EN_STATS);
+
+  const programs = (dbPrograms && dbPrograms.length > 0)
+    ? dbPrograms.map((p: { icon: string; title_en: string; title_fa: string | null; desc_en: string | null; desc_fa: string | null }) => ({ icon: p.icon, title: isFa ? (p.title_fa ?? p.title_en) : p.title_en, desc: isFa ? (p.desc_fa ?? p.desc_en ?? '') : (p.desc_en ?? '') }))
+    : (isFa ? FA_PROGRAMS : EN_PROGRAMS).map((p) => ({ icon: p.icon, title: p.title, desc: p.desc }));
+
+  const testimonials = (dbTestimonials && dbTestimonials.length > 0)
+    ? dbTestimonials.map((t: { name: string; role_label: string | null; quote: string }) => ({ quote: t.quote, name: t.name, role: t.role_label ?? '' }))
+    : (isFa ? FA_TESTIMONIALS : EN_TESTIMONIALS);
+
+  const news = (dbNews && dbNews.length > 0)
+    ? dbNews.map((a: { id: string; title: string; body: string; created_at: string }) => ({
+        date: new Date(a.created_at).toLocaleDateString(isFa ? 'fa-IR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        title: a.title,
+        desc: a.body.slice(0, 120) + (a.body.length > 120 ? '…' : ''),
+        category: 'Announcement',
+      }))
+    : (isFa ? FA_NEWS : EN_NEWS);
 
   return (
     <>
@@ -272,8 +297,8 @@ export default async function Home({ params }: Props) {
             </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-            {stats.map((stat) => (
-              <div key={stat.label} className="group bg-surface rounded-2xl p-6 sm:p-8 text-center shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-accent-light">
+            {stats.map((stat, i) => (
+              <div key={(stat as { id?: string }).id ?? stat.label ?? i} className="group bg-surface rounded-2xl p-6 sm:p-8 text-center shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-accent-light">
                 <div className="text-4xl mb-4">{stat.icon}</div>
                 <div className="font-display text-3xl sm:text-4xl font-light text-brand-900 mb-1">{stat.number}</div>
                 <div className="text-gray-400 text-xs font-semibold uppercase tracking-widest">{stat.label}</div>

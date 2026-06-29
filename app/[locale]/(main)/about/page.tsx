@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import PageHero from '@/app/components/PageHero';
 import { PRESIDENT, TEAM_MEMBERS } from '@/lib/data/team';
 import { SITE_CONFIG } from '@/lib/constants';
+import { createClient } from '@/lib/supabase/server';
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -65,6 +66,13 @@ export default async function AboutPage({ params }: Props) {
   const coreValues = isFa ? FA_CORE_VALUES : EN_CORE_VALUES;
   const milestones = isFa ? FA_MILESTONES : EN_MILESTONES;
   const goals = isFa ? FA_STRATEGIC_GOALS : EN_STRATEGIC_GOALS;
+
+  const supabase = await createClient();
+  const { data: dbTeam } = await supabase.from('team_members').select('*').eq('active', true).order('sort_order');
+
+  const teamData = dbTeam && dbTeam.length > 0 ? dbTeam : null;
+  const president = teamData ? teamData.find((m: { is_president: boolean }) => m.is_president) ?? teamData[0] : null;
+  const teamMembers = teamData ? teamData.filter((m: { is_president: boolean; id: string }) => !m.is_president || m.id !== president?.id) : null;
 
   return (
     <div className="bg-surface">
@@ -259,36 +267,52 @@ export default async function AboutPage({ params }: Props) {
             </h2>
           </div>
 
-          <div className="max-w-3xl mx-auto mb-16 bg-surface rounded-2xl p-8 sm:p-10 border border-gray-100 shadow-sm">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="relative shrink-0">
-                <div className="w-36 h-36 rounded-full overflow-hidden ring-4 ring-accent ring-offset-4 ring-offset-surface relative">
-                  <Image src={PRESIDENT.src} alt={PRESIDENT.alt} fill className="object-cover" sizes="144px" />
+          {/* President / Featured */}
+          {(president || PRESIDENT) && (() => {
+            const p = president ?? PRESIDENT;
+            const photoSrc = (p as { photo_url?: string; src?: string }).photo_url ?? (p as { src?: string }).src;
+            const photoAlt = (p as { alt?: string }).alt ?? p.name;
+            const role = isFa ? ((p as { title_fa?: string }).title_fa ?? (p as { title_en?: string; role?: string }).title_en ?? (p as { role?: string }).role ?? '') : ((p as { title_en?: string; role?: string }).title_en ?? (p as { role?: string }).role ?? '');
+            const bio = isFa ? ((p as { bio_fa?: string }).bio_fa ?? (p as { bio_en?: string; bio?: string }).bio_en ?? (p as { bio?: string }).bio ?? '') : ((p as { bio_en?: string; bio?: string }).bio_en ?? (p as { bio?: string }).bio ?? '');
+            return (
+              <div className="max-w-3xl mx-auto mb-16 bg-surface rounded-2xl p-8 sm:p-10 border border-gray-100 shadow-sm">
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="relative shrink-0">
+                    <div className="w-36 h-36 rounded-full overflow-hidden ring-4 ring-accent ring-offset-4 ring-offset-surface relative bg-brand-50">
+                      {photoSrc ? <Image src={photoSrc} alt={photoAlt} fill className="object-cover" sizes="144px" /> : <span className="absolute inset-0 flex items-center justify-center font-display text-5xl font-semibold text-brand-700">{p.name[0]}</span>}
+                    </div>
+                  </div>
+                  <div className="text-center md:text-left flex-1">
+                    <span className="inline-flex items-center gap-2 text-accent-dark font-semibold uppercase text-[11px] tracking-[0.15em] mb-3">
+                      <span className="w-6 h-px bg-accent" />{t('presidentLabel')}
+                    </span>
+                    <h3 className="font-display font-semibold text-2xl text-gray-900 mb-1">{p.name}</h3>
+                    <p className="text-brand-900 font-medium text-sm mb-4">{role}</p>
+                    <p className="text-gray-500 text-sm leading-relaxed">{bio}</p>
+                  </div>
                 </div>
               </div>
-              <div className="text-center md:text-left flex-1">
-                <span className="inline-flex items-center gap-2 text-accent-dark font-semibold uppercase text-[11px] tracking-[0.15em] mb-3">
-                  <span className="w-6 h-px bg-accent" />{t('presidentLabel')}
-                </span>
-                <h3 className="font-display font-semibold text-2xl text-gray-900 mb-1">{PRESIDENT.name}</h3>
-                <p className="text-brand-900 font-medium text-sm mb-4">{PRESIDENT.role}</p>
-                <p className="text-gray-500 text-sm leading-relaxed">{PRESIDENT.bio}</p>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {TEAM_MEMBERS.map((member) => (
-              <div key={member.name} className="group bg-surface rounded-2xl p-7 border border-gray-100 hover:border-accent-light hover:shadow-xl transition-all duration-500 text-center">
-                <div className="w-28 h-28 mx-auto rounded-full overflow-hidden ring-2 ring-gray-100 group-hover:ring-accent-muted ring-offset-2 ring-offset-surface transition-all duration-300 mb-5 relative">
-                  <Image src={member.src} alt={member.alt} fill className="object-cover" sizes="112px" />
+            {(teamMembers ?? TEAM_MEMBERS).map((member) => {
+              const photoSrc = (member as { photo_url?: string; src?: string }).photo_url ?? (member as { src?: string }).src;
+              const photoAlt = (member as { alt?: string }).alt ?? member.name;
+              const role = isFa ? ((member as { title_fa?: string }).title_fa ?? (member as { title_en?: string; role?: string }).title_en ?? (member as { role?: string }).role ?? '') : ((member as { title_en?: string; role?: string }).title_en ?? (member as { role?: string }).role ?? '');
+              const bio = isFa ? ((member as { bio_fa?: string }).bio_fa ?? (member as { bio_en?: string; bio?: string }).bio_en ?? (member as { bio?: string }).bio ?? '') : ((member as { bio_en?: string; bio?: string }).bio_en ?? (member as { bio?: string }).bio ?? '');
+              return (
+                <div key={member.name} className="group bg-surface rounded-2xl p-7 border border-gray-100 hover:border-accent-light hover:shadow-xl transition-all duration-500 text-center">
+                  <div className="w-28 h-28 mx-auto rounded-full overflow-hidden ring-2 ring-gray-100 group-hover:ring-accent-muted ring-offset-2 ring-offset-surface transition-all duration-300 mb-5 relative bg-brand-50">
+                    {photoSrc ? <Image src={photoSrc} alt={photoAlt} fill className="object-cover" sizes="112px" /> : <span className="absolute inset-0 flex items-center justify-center font-display text-3xl font-semibold text-brand-700">{member.name[0]}</span>}
+                  </div>
+                  <h3 className="font-display font-semibold text-xl text-gray-900 mb-1">{member.name}</h3>
+                  <p className="text-accent-dark font-semibold text-xs uppercase tracking-wider mb-3">{role}</p>
+                  <div className="w-8 h-px bg-accent-muted mx-auto mb-4" />
+                  <p className="text-gray-500 text-sm leading-relaxed">{bio}</p>
                 </div>
-                <h3 className="font-display font-semibold text-xl text-gray-900 mb-1">{member.name}</h3>
-                <p className="text-accent-dark font-semibold text-xs uppercase tracking-wider mb-3">{member.role}</p>
-                <div className="w-8 h-px bg-accent-muted mx-auto mb-4" />
-                <p className="text-gray-500 text-sm leading-relaxed">{member.bio}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

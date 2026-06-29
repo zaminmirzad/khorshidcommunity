@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import PageHero from '@/app/components/PageHero';
 import { GALLERY_IMAGES, GALLERY_CATEGORIES } from '@/lib/data/gallery';
+import type { GalleryItem } from './page';
 
 const PAGE_SIZE = 9;
 
@@ -17,20 +18,32 @@ const FA_CATEGORY_NAMES: Record<string, string> = {
   arts: 'هنر',
 };
 
-export default function GalleryClient() {
+export default function GalleryClient({ dbImages }: { dbImages: GalleryItem[] }) {
   const t = useTranslations('gallery');
   const locale = useLocale();
   const isFa = locale === 'fa';
 
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedImage, setSelectedImage] = useState<typeof GALLERY_IMAGES[0] | null>(null);
+  const [selectedImage, setSelectedImage] = useState<{ id: number | string; src: string; title: string; description: string; date: string; location: string; category: string } | null>(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const galleryStats = t.raw('galleryStats') as Array<{ number: string; label: string }>;
 
+  const sourceImages = dbImages.length > 0
+    ? dbImages.map((item) => ({
+        id: item.id,
+        category: item.category,
+        src: item.url,
+        title: item.title,
+        description: item.description ?? '',
+        date: item.date_label ?? '',
+        location: item.location ?? '',
+      }))
+    : GALLERY_IMAGES;
+
   const filteredImages = selectedCategory === 'all'
-    ? GALLERY_IMAGES
-    : GALLERY_IMAGES.filter((img) => img.category === selectedCategory);
+    ? sourceImages
+    : sourceImages.filter((img) => img.category === selectedCategory);
 
   const visibleImages = filteredImages.slice(0, visibleCount);
   const hasMore = visibleCount < filteredImages.length;
@@ -151,7 +164,7 @@ export default function GalleryClient() {
               {visibleImages.map((image) => (
                 <button
                   key={image.id}
-                  onClick={() => openLightbox(image)}
+                  onClick={() => openLightbox(image as Parameters<typeof openLightbox>[0])}
                   className="group relative overflow-hidden rounded-2xl border border-gray-200 hover:border-accent/40 hover:shadow-2xl transition-all duration-500 text-left w-full hover:-translate-y-1"
                 >
                   <div className="relative h-64 sm:h-72 overflow-hidden bg-gray-100">
