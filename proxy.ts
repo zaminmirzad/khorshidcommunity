@@ -42,9 +42,9 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // /sign-in: redirect authenticated users to dashboard, otherwise pass through as-is
-  if (pathname === '/sign-in') {
-    if (user) return NextResponse.redirect(new URL('/dashboard', request.url));
+  // Auth pages: pass through as-is (no locale processing)
+  if (pathname === '/sign-in' || pathname === '/forgot-password' || pathname === '/reset-password') {
+    if (pathname === '/sign-in' && user) return NextResponse.redirect(new URL('/dashboard', request.url));
     return response;
   }
 

@@ -8,7 +8,7 @@ export default function PayButton() {
     setLoading(true);
     const res = await fetch('/api/payments/checkout', { method: 'POST' });
     const { url, error } = await res.json();
-    if (error || !url) { setLoading(false); alert('Could not start checkout. Please try again.'); return; }
+    if (error || !url) { setLoading(false); alert(error ?? 'Could not start checkout.'); return; }
     window.location.href = url;
   }
 
