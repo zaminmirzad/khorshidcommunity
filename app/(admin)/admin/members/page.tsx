@@ -49,6 +49,32 @@ export default function MembersPage() {
             <em className="italic text-brand-900 dark:text-brand-300">Members</em>
           </h1>
         </div>
+        <button
+          onClick={() => {
+            const rows = [['Name', 'Email', 'Phone', 'Role', 'Joined'].join(',')];
+            members.forEach((m) => {
+              rows.push([
+                `"${m.full_name.replace(/"/g, '""')}"`,
+                `"${m.email.replace(/"/g, '""')}"`,
+                `"${(m.phone ?? '').replace(/"/g, '""')}"`,
+                m.role,
+                new Date(m.joined_at).toLocaleDateString('en-US'),
+              ].join(','));
+            });
+            const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `members-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+          disabled={loading || members.length === 0}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-all"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          Export CSV
+        </button>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">

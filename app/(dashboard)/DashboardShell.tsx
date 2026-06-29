@@ -11,6 +11,7 @@ type Props = {
   memberName: string;
   joinedAt: string;
   isAdmin: boolean;
+  unreadAnnouncements: number;
 };
 
 const NAV_ITEMS = [
@@ -21,7 +22,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/settings', label: 'Settings', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
 ];
 
-function SidebarContent({ memberName, joinedAt, isAdmin, onNav }: { memberName: string; joinedAt: string; isAdmin: boolean; onNav?: () => void }) {
+function SidebarContent({ memberName, joinedAt, isAdmin, unreadAnnouncements, onNav }: { memberName: string; joinedAt: string; isAdmin: boolean; unreadAnnouncements: number; onNav?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const initial = memberName ? memberName[0].toUpperCase() : 'M';
@@ -58,13 +59,21 @@ function SidebarContent({ memberName, joinedAt, isAdmin, onNav }: { memberName: 
       <nav className="flex-1 px-3 py-2 space-y-0.5 relative z-10">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href;
+          const badge = item.href === '/dashboard' && unreadAnnouncements > 0 ? unreadAnnouncements : null;
           return (
             <Link key={item.href} href={item.href} onClick={onNav}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${isActive ? 'bg-white/10 text-white' : 'text-brand-400 hover:bg-white/6 hover:text-brand-100'}`}
             >
               <span className={`shrink-0 transition-colors ${isActive ? 'text-accent' : 'text-brand-500 group-hover:text-brand-300'}`}>{item.icon}</span>
               {item.label}
-              {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-accent shrink-0" />}
+              <span className="ml-auto flex items-center gap-1.5 shrink-0">
+                {badge !== null && (
+                  <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-brand-950 text-[10px] font-bold flex items-center justify-center">
+                    {badge > 9 ? '9+' : badge}
+                  </span>
+                )}
+                {isActive && badge === null && <span className="w-1.5 h-1.5 rounded-full bg-accent" />}
+              </span>
             </Link>
           );
         })}
@@ -109,7 +118,7 @@ function ThemeToggle({ dark, toggle }: { dark: boolean; toggle: () => void }) {
   );
 }
 
-export default function DashboardShell({ children, memberName, joinedAt, isAdmin }: Props) {
+export default function DashboardShell({ children, memberName, joinedAt, isAdmin, unreadAnnouncements }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { dark, toggle } = useTheme();
   const initial = memberName ? memberName[0].toUpperCase() : 'M';
@@ -118,14 +127,14 @@ export default function DashboardShell({ children, memberName, joinedAt, isAdmin
     <div className={dark ? 'dark' : ''} suppressHydrationWarning>
       <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
         <div className="hidden lg:block lg:w-64 lg:fixed lg:inset-y-0 shrink-0">
-          <SidebarContent memberName={memberName} joinedAt={joinedAt} isAdmin={isAdmin} />
+          <SidebarContent memberName={memberName} joinedAt={joinedAt} isAdmin={isAdmin} unreadAnnouncements={unreadAnnouncements} />
         </div>
 
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 bg-brand-950/70 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
         )}
         <div className={`fixed inset-y-0 left-0 z-50 w-64 lg:hidden transform transition-transform duration-300 ease-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <SidebarContent memberName={memberName} joinedAt={joinedAt} isAdmin={isAdmin} onNav={() => setSidebarOpen(false)} />
+          <SidebarContent memberName={memberName} joinedAt={joinedAt} isAdmin={isAdmin} unreadAnnouncements={unreadAnnouncements} onNav={() => setSidebarOpen(false)} />
         </div>
 
         <div className="flex-1 flex flex-col min-w-0 lg:pl-64">

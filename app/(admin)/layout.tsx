@@ -16,13 +16,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!member || member.role !== 'admin') redirect('/dashboard');
 
-  const { count: pendingCount } = await supabase
-    .from('membership_requests')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'pending');
+  const [{ count: pendingCount }, { count: unreadMessages }] = await Promise.all([
+    supabase.from('membership_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('contact_submissions').select('*', { count: 'exact', head: true }).eq('status', 'unread'),
+  ]);
 
   return (
-    <AdminShell memberName={member.full_name} pendingCount={pendingCount ?? 0}>
+    <AdminShell memberName={member.full_name} pendingCount={pendingCount ?? 0} unreadMessages={unreadMessages ?? 0}>
       {children}
     </AdminShell>
   );

@@ -3,18 +3,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import PayButton from './PayButton';
 
-const UPCOMING_EVENTS = [
-  { title: 'Summer Cultural Festival', date: 'Jul 12, 2026', day: '12', month: 'Jul', location: 'Balboa Park, San Diego', category: 'Festival', spots: '42 spots left' },
-  { title: 'Persian Language Workshop', date: 'Jul 19, 2026', day: '19', month: 'Jul', location: 'Khorshid Community Center', category: 'Education', spots: '8 spots left' },
-  { title: 'Community Dinner & Gathering', date: 'Aug 2, 2026', day: '2', month: 'Aug', location: 'La Jolla Cove Pavilion', category: 'Social', spots: 'Open' },
-];
-
-const CATEGORY_COLORS: Record<string, string> = {
-  Festival: 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400',
-  Education: 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400',
-  Social: 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400',
-};
-
 function greeting() {
   const h = new Date().getHours();
   if (h < 12) return 'Good morning';
@@ -62,11 +50,21 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
 
   if (!member) redirect('/sign-in');
 
-  const { data: payments } = await supabase
-    .from('payments')
-    .select('*')
-    .eq('member_id', member.id)
-    .order('paid_at', { ascending: false });
+  const [{ data: payments }, { data: announcements }, { data: myRegs }] = await Promise.all([
+    supabase.from('payments').select('*').eq('member_id', member.id).order('paid_at', { ascending: false }),
+    supabase.from('announcements').select('id, title, body, created_at').eq('active', true).order('created_at', { ascending: false }).limit(5),
+    supabase.from('event_registrations').select('event_id, events!inner(id, title, date, location, capacity)').eq('member_id', member.id).eq('status', 'registered'),
+  ]);
+
+  type RegWithEvent = {
+    event_id: string;
+    events: { id: string; title: string; date: string; location: string | null; capacity: number | null };
+  };
+
+  const allRegs = (myRegs ?? []) as unknown as RegWithEvent[];
+  const nowDate = new Date();
+  const upcomingRegs = allRegs.filter((r) => new Date(r.events.date) >= nowDate).sort((a, b) => new Date(a.events.date).getTime() - new Date(b.events.date).getTime()).slice(0, 3);
+  const eventsAttended = allRegs.filter((r) => new Date(r.events.date) < nowDate).length;
 
   const firstName = member.full_name.split(' ')[0];
   const daysAsMember = daysAgo(member.joined_at);
@@ -77,8 +75,8 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
   const STATS = [
     { label: 'Days as Member', value: daysAsMember.toLocaleString(), change: formatDays(daysAsMember), positive: true, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>, color: 'bg-amber-50 dark:bg-amber-950/30 text-amber-600' },
     { label: 'Payments Made', value: String((payments ?? []).length), change: hasPaid ? 'All paid' : 'None yet', positive: hasPaid, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>, color: 'bg-green-50 dark:bg-green-950/30 text-green-600' },
-    { label: 'Upcoming Events', value: '3', change: 'Next: Jul 12', positive: true, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, color: 'bg-brand-50 dark:bg-brand-950/50 text-brand-600' },
-    { label: 'Events Attended', value: '—', change: 'Coming soon', positive: true, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>, color: 'bg-purple-50 dark:bg-purple-950/30 text-purple-600' },
+    { label: 'Upcoming Events', value: String(upcomingRegs.length), change: upcomingRegs.length > 0 ? `Next: ${new Date(upcomingRegs[0].events.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'None registered', positive: upcomingRegs.length > 0, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, color: 'bg-brand-50 dark:bg-brand-950/50 text-brand-600' },
+    { label: 'Events Attended', value: String(eventsAttended), change: eventsAttended > 0 ? 'Great participation!' : 'Register for events', positive: eventsAttended > 0, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>, color: 'bg-purple-50 dark:bg-purple-950/30 text-purple-600' },
   ];
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -106,6 +104,23 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
         <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-sm">Here&apos;s what&apos;s happening in your community.</p>
       </div>
 
+      {announcements && announcements.length > 0 && (
+        <div className="space-y-2">
+          {announcements.map((a: { id: string; title: string; body: string; created_at: string }) => (
+            <div key={a.id} className="flex gap-4 bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900/50 rounded-2xl px-5 py-4">
+              <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0 mt-0.5">
+                <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-brand-900 dark:text-brand-200">{a.title}</p>
+                <p className="text-sm text-brand-700 dark:text-brand-400 mt-0.5 leading-relaxed">{a.body}</p>
+                <p className="text-xs text-brand-500 dark:text-brand-600 mt-1">{new Date(a.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         {STATS.map((s) => (
           <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-shadow">
@@ -129,22 +144,27 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
             <Link href="/dashboard/events" className="text-sm text-accent-dark font-semibold hover:text-accent transition-colors">View all →</Link>
           </div>
           <div className="divide-y divide-gray-50 dark:divide-gray-800">
-            {UPCOMING_EVENTS.map((event) => (
-              <div key={event.title} className="flex items-start gap-4 px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-950/50 border border-brand-100 dark:border-brand-900/50 flex flex-col items-center justify-center shrink-0">
-                  <span className="font-bold text-brand-900 dark:text-brand-300 text-lg leading-none">{event.day}</span>
-                  <span className="text-brand-500 dark:text-brand-500 text-[10px] uppercase tracking-wide">{event.month}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-snug group-hover:text-brand-900 dark:group-hover:text-brand-300 transition-colors">{event.title}</h3>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${CATEGORY_COLORS[event.category]}`}>{event.category}</span>
-                  </div>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{event.location}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{event.date} · {event.spots}</p>
-                </div>
+            {upcomingRegs.length === 0 ? (
+              <div className="px-6 py-10 text-center">
+                <p className="text-sm text-gray-400 dark:text-gray-500 mb-3">You haven&apos;t registered for any upcoming events.</p>
+                <Link href="/dashboard/events" className="text-sm font-semibold text-accent-dark hover:text-accent transition-colors">Browse events →</Link>
               </div>
-            ))}
+            ) : upcomingRegs.map((reg) => {
+              const d = new Date(reg.events.date);
+              return (
+                <div key={reg.event_id} className="flex items-start gap-4 px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
+                  <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-950/50 border border-brand-100 dark:border-brand-900/50 flex flex-col items-center justify-center shrink-0">
+                    <span className="font-bold text-brand-900 dark:text-brand-300 text-lg leading-none">{d.getDate()}</span>
+                    <span className="text-brand-500 dark:text-brand-500 text-[10px] uppercase tracking-wide">{d.toLocaleDateString('en-US', { month: 'short' })}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-snug group-hover:text-brand-900 dark:group-hover:text-brand-300 transition-colors">{reg.events.title}</h3>
+                    {reg.events.location && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{reg.events.location}</p>}
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

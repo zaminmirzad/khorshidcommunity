@@ -49,6 +49,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to send message. Please try again.' }, { status: 500 });
     }
 
+    // Save to DB non-blocking
+    try {
+      const { createAdminClient } = await import('@/lib/supabase/server');
+      const admin = createAdminClient();
+      await admin.from('contact_submissions').insert({ name, email, phone: phone ?? null, subject, message });
+    } catch (e) {
+      console.error('Failed to save contact submission:', e);
+    }
+
     return NextResponse.json({ message: 'Message sent successfully! We will get back to you soon.' }, { status: 200 });
   } catch (err) {
     console.error('Contact route error:', err);
