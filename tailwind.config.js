@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -7,33 +8,47 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['var(--font-display)', 'var(--font-persian)', 'Georgia', 'serif'],
+        sans: ['var(--font-sans)', 'var(--font-persian)', 'system-ui', 'sans-serif'],
+        persian: ['var(--font-persian)', 'Vazirmatn', 'sans-serif'],
+      },
+
       colors: {
-        amber: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
+        // ── Brand (primary dark color) ─────────────────────────────────────
+        // All values are CSS-variable–backed so the entire brand color
+        // changes by editing --brand-* in globals.css.
+        brand: {
+          50:  'rgb(var(--brand-50)  / <alpha-value>)',
+          100: 'rgb(var(--brand-100) / <alpha-value>)',
+          200: 'rgb(var(--brand-200) / <alpha-value>)',
+          300: 'rgb(var(--brand-300) / <alpha-value>)',
+          400: 'rgb(var(--brand-400) / <alpha-value>)',
+          500: 'rgb(var(--brand-500) / <alpha-value>)',
+          600: 'rgb(var(--brand-600) / <alpha-value>)',
+          700: 'rgb(var(--brand-700) / <alpha-value>)',
+          800: 'rgb(var(--brand-800) / <alpha-value>)',
+          900: 'rgb(var(--brand-900) / <alpha-value>)',
+          950: 'rgb(var(--brand-950) / <alpha-value>)',
         },
-        orange: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+
+        // ── Accent (gold / highlight color) ───────────────────────────────
+        accent: {
+          light:   'rgb(var(--accent-light)   / <alpha-value>)', // subtle tint, e.g. amber-100
+          muted:   'rgb(var(--accent-muted)   / <alpha-value>)', // on dark bg, e.g. amber-300
+          DEFAULT: 'rgb(var(--accent)         / <alpha-value>)', // main, e.g. amber-400
+          hover:   'rgb(var(--accent-hover)   / <alpha-value>)', // button hover, e.g. amber-500
+          dark:    'rgb(var(--accent-dark)    / <alpha-value>)', // labels on light, e.g. amber-600
+          text:    'rgb(var(--accent-text)    / <alpha-value>)', // highest contrast text, e.g. amber-800
+        },
+
+        // ── Surface (page background colors) ──────────────────────────────
+        surface: {
+          DEFAULT: 'rgb(var(--surface)     / <alpha-value>)', // white
+          alt:     'rgb(var(--surface-alt) / <alpha-value>)', // cream #faf8f4
         },
       },
     },
   },
   plugins: [],
-}
+};

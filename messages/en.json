@@ -1,0 +1,253 @@
+{
+  "nav": {
+    "home": "Home",
+    "events": "Events",
+    "about": "About",
+    "gallery": "Gallery",
+    "contact": "Contact"
+  },
+  "header": {
+    "signIn": "Sign In",
+    "joinUs": "Join Us",
+    "joinCommunity": "Join Our Community",
+    "english": "English",
+    "farsi": "فارسی"
+  },
+  "home": {
+    "badge": "Est. 1998 · Nonprofit 501(c)(3)",
+    "heroCta1": "Explore Events",
+    "heroCta2": "Our Story",
+    "heroSubtitle": "Keeping Our Culture Alive, Uniting Generations, Building a Vibrant Future",
+    "heroBody": "Join 5,000+ members celebrating Hazara and Persian heritage through cultural events, educational programs, and community support in San Diego.",
+    "heroStats": [
+      {
+        "value": "5,200+",
+        "label": "Lives Impacted"
+      },
+      {
+        "value": "48",
+        "label": "Annual Events"
+      },
+      {
+        "value": "350+",
+        "label": "Volunteers"
+      }
+    ],
+    "missionOverline": "Our Purpose",
+    "missionTitle": "One Community. One Family. One Future.",
+    "missionBody": "KhorshidCommunity bridges generations, preserves Hazara and Persian heritage, and empowers individuals through connection, culture, and compassionate action.",
+    "programsOverline": "What We Do",
+    "programsTitle": "Six Pillars of Community",
+    "programsSubtitle": "Cultural preservation and empowerment through every stage of life.",
+    "programsLearnMore": "Learn more",
+    "eventsOverline": "Join Us",
+    "eventsTitle": "Upcoming Events",
+    "eventsDetails": "Details →",
+    "eventsViewAll": "View All Events",
+    "impactOverline": "Our Impact",
+    "impactTitle": "Making a Difference Daily",
+    "testimonialsOverline": "Voices of Our Community",
+    "testimonialsTitle": "What Members Say",
+    "newsOverline": "Stay Informed",
+    "newsTitle": "Latest Updates",
+    "newsReadMore": "Read More →",
+    "floatingCta": "Get Involved"
+  },
+  "about": {
+    "badge": "About KhorshidCommunity",
+    "heroTitle": "Preserving Heritage, Building Futures",
+    "heroSubtitle": "Serving our community since {year} with pride, purpose, and dedication",
+    "storyOverline": "Our Story",
+    "storyTitle": "Who We Are",
+    "storyBody": "KhorshidCommunity is a vibrant, nonprofit organization dedicated to uniting and empowering the Hazara and Persian-speaking community and culture enthusiasts. Founded in {year} by passionate volunteers, we've grown into a thriving hub of cultural celebration, educational programs, and social support — serving over 5,000 community members annually.",
+    "purposeOverline": "Our Purpose",
+    "purposeTitle": "Mission & Vision",
+    "missionTitle": "Our Mission",
+    "missionBody": "To unite, empower, and celebrate the Khorshid community by preserving cultural traditions, providing educational opportunities, and fostering meaningful social connections across generations. We strive to create a home away from home where every member feels valued, heard, and inspired.",
+    "visionTitle": "Our Vision",
+    "visionBody": "A world where the rich tapestry of Hazara and Persian culture thrives for generations to come — where every individual, regardless of age or background, finds belonging, purpose, and an opportunity to contribute to a vibrant, interconnected community.",
+    "valuesOverline": "What We Stand For",
+    "valuesTitle": "Our Core Values",
+    "journeyOverline": "Our Journey",
+    "journeyTitle": "Key Milestones",
+    "goalsOverline": "Our Roadmap",
+    "goalsTitle": "Strategic Goals 2025–2028",
+    "leadersOverline": "Our Leaders",
+    "leadersTitle": "Meet the Team",
+    "presidentLabel": "President",
+    "ctaOverline": "Join Us",
+    "ctaTitle": "Become Part of Our Story",
+    "ctaBody": "Whether you're looking to volunteer, donate, or simply join our events — there's a place for you at KhorshidCommunity.",
+    "ctaBtn1": "Join Our Community",
+    "ctaBtn2": "View Upcoming Events"
+  },
+  "events": {
+    "badge": "Come Together",
+    "heroTitle": "Events & Programs",
+    "heroSubtitle": "From cultural festivals to sports activities — there's always something happening at KhorshidCommunity.",
+    "upcomingOverline": "Upcoming Gatherings",
+    "upcomingBody": "Reserve your spot — all community events are open to members and guests alike.",
+    "rsvpNow": "RSVP Now",
+    "joinMatch": "Join Match",
+    "freeForMembers": "Free for members",
+    "ideaOverline": "Have an Idea?",
+    "ideaTitle": "Want to Host or Suggest a Program?",
+    "ideaBody": "We welcome ideas from our community. Reach out to our events team and let's build something great together.",
+    "ideaCta": "Contact Events Team"
+  },
+  "gallery": {
+    "badge": "Our Memories",
+    "heroTitle": "Photo Gallery",
+    "heroSubtitle": "Capturing the vibrant spirit, culture, and unity of KhorshidCommunity",
+    "archivesOverline": "Our Archives",
+    "archivesTitle": "Memories in Numbers",
+    "galleryStats": [
+      {
+        "number": "500+",
+        "label": "Photos Captured"
+      },
+      {
+        "number": "48+",
+        "label": "Events Covered"
+      },
+      {
+        "number": "15",
+        "label": "Years of Memories"
+      },
+      {
+        "number": "1000+",
+        "label": "Happy Faces"
+      }
+    ],
+    "browseOverline": "Browse by Category",
+    "browseTitle": "Explore the Gallery",
+    "noPhotos": "No photos yet",
+    "noPhotosSub": "Check back soon for more memories from this category.",
+    "loadMore": "Load More Memories",
+    "watchOverline": "Watch",
+    "watchTitle": "Event Highlights",
+    "videoLabel1": "Nowruz Festival 2024 Highlights",
+    "videoLabel2": "Community Volunteer Day",
+    "videoSoon": "Coming soon on YouTube",
+    "shareOverline": "Share Your Moments",
+    "shareTitle": "Have Photos from Our Events?",
+    "shareBody": "We'd love to feature your memories in our gallery. Tag us on social media or send us your favorite moments.",
+    "shareBtn1": "Submit Your Photos",
+    "shareBtn2": "Copy #KhorshidCommunity"
+  },
+  "contact": {
+    "badge": "We're Here",
+    "heroTitle": "Get in Touch",
+    "heroSubtitle": "We'd love to hear from you — reach out anytime and we'll respond within 24 hours.",
+    "reachOverline": "Reach Out",
+    "reachTitle": "We're Always Available",
+    "callTitle": "Call Us",
+    "callDetail": "Mon – Fri · 10AM – 6PM",
+    "callAction": "Call Now",
+    "emailTitle": "Email Us",
+    "emailDetail": "Response within 24 hours",
+    "emailAction": "Send Email",
+    "visitTitle": "Visit Us",
+    "visitDetail": "See office hours below",
+    "visitAction": "Get Directions",
+    "formOverline": "Send a Message",
+    "formTitle": "We're Here to Help",
+    "formSubtitle": "Fill out the form and we'll respond within 24 hours.",
+    "nameLabel": "Full Name *",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email Address *",
+    "emailPlaceholder": "you@example.com",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "(619) 000-0000",
+    "subjectLabel": "Subject *",
+    "subjectPlaceholder": "Select a topic",
+    "messageLabel": "Message *",
+    "messagePlaceholder": "Tell us how we can help...",
+    "submitBtn": "Send Message →",
+    "submittingBtn": "Sending...",
+    "successTitle": "Message Sent Successfully!",
+    "successBody": "Thank you for reaching out. We'll respond shortly.",
+    "errorTitle": "Something went wrong",
+    "privacyNote": "By submitting, you agree to our privacy policy.",
+    "subjects": [
+      "General Inquiry",
+      "Volunteer Opportunities",
+      "Event Participation",
+      "Partnership/Collaboration",
+      "Donation Support",
+      "Membership Questions",
+      "Media/Press"
+    ],
+    "hoursTitle": "Office Hours",
+    "monday": "Monday – Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "faqOverline": "Quick Answers",
+    "faqTitle": "Frequently Asked Questions",
+    "faqItems": [
+      {
+        "q": "How can I become a member?",
+        "a": "Simply fill out the contact form or visit us during office hours. Membership is free and open to all."
+      },
+      {
+        "q": "Are events free to attend?",
+        "a": "Most events are free for members. Some special events may have a nominal fee to cover costs."
+      },
+      {
+        "q": "How can I volunteer?",
+        "a": "We're always looking for volunteers! Select 'Volunteer Opportunities' in the form above."
+      },
+      {
+        "q": "Do you offer language classes?",
+        "a": "Yes! We offer Persian language classes for all levels. Check our events page for schedules."
+      }
+    ],
+    "faqFooter": "Still have questions?",
+    "faqFooterLink": "Use the form above",
+    "faqFooterSuffix": "or call us directly.",
+    "membershipOverline": "Membership",
+    "membershipTitle": "Become Part of Our Family",
+    "membershipBody": "Join 5,000+ members — membership is free and open to everyone.",
+    "membershipCta": "Explore Events"
+  },
+  "footer": {
+    "ctaTitle": "Ready to be part of ",
+    "ctaAccent": "our story?",
+    "ctaSubtitle": "Join 5,000+ members celebrating Hazara and Persian heritage.",
+    "getInvolved": "Get Involved",
+    "viewEvents": "View Events",
+    "exploreSection": "Explore",
+    "contactSection": "Contact",
+    "hoursSection": "Office Hours",
+    "weekdays": "Mon – Fri",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "nonprofit": "501(c)(3) Nonprofit",
+    "registered": "Registered",
+    "copyright": "All rights reserved.",
+    "tagline": "Built with care for our community.",
+    "backToTop": "Back to top",
+    "quote": "Uniting hearts, preserving heritage, building futures.",
+    "serving": "Serving the Hazara and Persian community in San Diego since {year}."
+  },
+  "join": {
+    "badge": "Membership",
+    "title": "Join Our Community",
+    "subtitle": "Membership is by invitation. Submit your details and our team will review your request — approved members receive an email invite to complete registration.",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Your full name",
+    "email": "Email Address",
+    "emailPlaceholder": "you@example.com",
+    "phone": "Phone Number",
+    "phoneOptional": "Optional",
+    "phonePlaceholder": "+1 (619) 000-0000",
+    "message": "Why do you want to join?",
+    "messagePlaceholder": "Tell us a bit about yourself and your connection to the Hazara or Persian community...",
+    "submit": "Submit Request",
+    "submitting": "Submitting...",
+    "successTitle": "Request Received!",
+    "successBody": "Thank you for your interest in Khorshid Community. We'll review your request and reach out within a few days.",
+    "successBack": "Back to home",
+    "error": "Something went wrong. Please try again."
+  }
+}
