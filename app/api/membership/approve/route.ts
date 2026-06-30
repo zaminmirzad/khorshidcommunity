@@ -19,13 +19,13 @@ export async function POST(request: Request) {
   // Send invite via Supabase Admin client
   const adminClient = createAdminClient();
   const { error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/sign-up`,
+    redirectTo: `${process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/sign-up`,
     data: { full_name: fullName },
   });
 
   if (inviteError) {
     console.error('Invite error:', inviteError);
-    return NextResponse.json({ error: 'Failed to send invite.' }, { status: 500 });
+    return NextResponse.json({ error: inviteError.message }, { status: 500 });
   }
 
   // Mark request as approved

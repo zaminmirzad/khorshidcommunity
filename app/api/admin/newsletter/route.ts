@@ -59,7 +59,7 @@ export async function POST(request: Request) {
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const fromEmail = 'KhorshidCommunity <onboarding@resend.dev>';
+  const fromEmail = 'KhorshidCommunity <noreply@khorshidcommunity.com>';
 
   const htmlBody = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; color: #1a1a1a;">

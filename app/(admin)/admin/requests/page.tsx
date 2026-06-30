@@ -20,6 +20,7 @@ export default function RequestsPage() {
   const [filter, setFilter] = useState<Filter>('pending');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   async function fetchRequests() {
@@ -36,13 +37,17 @@ export default function RequestsPage() {
 
   async function handleApprove(req: Request) {
     setActionLoading(req.id);
+    setActionError(null);
     const res = await fetch('/api/membership/approve', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: req.id, email: req.email, fullName: req.full_name }),
     });
+    const json = await res.json();
     if (res.ok) {
       setRequests((prev) => prev.map((r) => r.id === req.id ? { ...r, status: 'approved' } : r));
+    } else {
+      setActionError(json.error ?? 'Failed to approve request.');
     }
     setActionLoading(null);
   }
@@ -76,6 +81,13 @@ export default function RequestsPage() {
           <p className="text-sm text-amber-600 dark:text-amber-400 mt-1.5 font-medium">{pendingCount} pending review</p>
         )}
       </div>
+
+      {actionError && (
+        <div className="px-4 py-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm flex items-center justify-between gap-3">
+          <span>{actionError}</span>
+          <button onClick={() => setActionError(null)} className="text-red-400 hover:text-red-600 transition-colors shrink-0">✕</button>
+        </div>
+      )}
 
       {/* Filter tabs */}
       <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
