@@ -22,22 +22,18 @@ export async function POST(request: Request) {
 
   if (!product) return NextResponse.json({ error: 'Product not found.' }, { status: 404 });
 
-  let session;
   try {
-    session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    line_items: [{ price: product.stripe_price_id, quantity: 1 }],
-    customer_email: member.email,
-    metadata: { member_id: member.id, product_id: product.id, stripe_price_id: product.stripe_price_id },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/membership?payment=success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/membership?payment=cancelled`,
-  });
-
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      line_items: [{ price: product.stripe_price_id, quantity: 1 }],
+      customer_email: member.email,
+      metadata: { member_id: member.id, product_id: product.id, stripe_price_id: product.stripe_price_id },
+      success_url: `${process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL}/dashboard/membership?payment=success`,
+      cancel_url: `${process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL}/dashboard/membership?payment=cancelled`,
+    });
+    return NextResponse.json({ url: session.url });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error('Stripe error:', msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
-
-  return NextResponse.json({ url: session.url });
 }
