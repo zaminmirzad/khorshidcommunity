@@ -95,9 +95,9 @@ export default async function AdminOverviewPage() {
       <div className="grid grid-cols-2 xl:grid-cols-5 gap-4">
         {STATS.map((s) => (
           <Link key={s.label} href={s.href}
-            className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all duration-200 group">
+            className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all duration-200 group">
             <div className="flex items-start justify-between mb-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>{s.icon}</div>
+              <div className={`w-10 h-10 rounded-md flex items-center justify-center ${s.color}`}>{s.icon}</div>
               <svg className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </div>
             <div className="font-display text-2xl font-light text-gray-900 dark:text-white leading-none mb-1">{s.value}</div>
@@ -108,7 +108,7 @@ export default async function AdminOverviewPage() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-6 py-5 border-b border-gray-50 dark:border-gray-800">
             <div>
               <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-1"><span className="w-4 h-px bg-accent" />Members</span>
@@ -160,7 +160,7 @@ export default async function AdminOverviewPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-6 py-5 border-b border-gray-50 dark:border-gray-800">
             <div>
               <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-1"><span className="w-4 h-px bg-accent" />Payments</span>

@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import PayButton from './PayButton';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 
 function greeting() {
   const h = new Date().getHours();
@@ -50,8 +49,10 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
 
   if (!member) redirect('/sign-in');
 
+  const admin = createAdminClient();
+
   const [{ data: payments }, { data: announcements }, { data: myRegs }] = await Promise.all([
-    supabase.from('payments').select('*').eq('member_id', member.id).order('paid_at', { ascending: false }),
+    admin.from('payments').select('*').eq('member_id', member.id).order('paid_at', { ascending: false }),
     supabase.from('announcements').select('id, title, body, created_at').eq('active', true).order('created_at', { ascending: false }).limit(5),
     supabase.from('event_registrations').select('event_id, events!inner(id, title, date, location, capacity)').eq('member_id', member.id).eq('status', 'registered'),
   ]);
@@ -74,7 +75,7 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
 
   const STATS = [
     { label: 'Days as Member', value: daysAsMember.toLocaleString(), change: formatDays(daysAsMember), positive: true, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>, color: 'bg-amber-50 dark:bg-amber-950/30 text-amber-600' },
-    { label: 'Payments Made', value: String((payments ?? []).length), change: hasPaid ? 'All paid' : 'None yet', positive: hasPaid, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>, color: 'bg-green-50 dark:bg-green-950/30 text-green-600' },
+    { label: 'Payments Made', value: String((payments ?? []).length), change: hasPaid ? 'View history →' : 'None yet', positive: hasPaid, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>, color: 'bg-green-50 dark:bg-green-950/30 text-green-600' },
     { label: 'Upcoming Events', value: String(upcomingRegs.length), change: upcomingRegs.length > 0 ? `Next: ${new Date(upcomingRegs[0].events.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'None registered', positive: upcomingRegs.length > 0, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, color: 'bg-brand-50 dark:bg-brand-950/50 text-brand-600' },
     { label: 'Events Attended', value: String(eventsAttended), change: eventsAttended > 0 ? 'Great participation!' : 'Register for events', positive: eventsAttended > 0, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>, color: 'bg-purple-50 dark:bg-purple-950/30 text-purple-600' },
   ];
@@ -84,13 +85,13 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
   return (
     <div className="space-y-8">
       {payment === 'success' && (
-        <div className="flex items-center gap-3 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-5 py-4 rounded-2xl text-sm font-medium">
+        <div className="flex items-center gap-3 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-5 py-4 rounded-lg text-sm font-medium">
           <svg className="w-5 h-5 shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           Payment successful — thank you for your membership contribution!
         </div>
       )}
       {payment === 'cancelled' && (
-        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 px-5 py-4 rounded-2xl text-sm font-medium">
+        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 px-5 py-4 rounded-lg text-sm font-medium">
           <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           Payment cancelled — no charge was made.
         </div>
@@ -107,7 +108,7 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
       {announcements && announcements.length > 0 && (
         <div className="space-y-2">
           {announcements.map((a: { id: string; title: string; body: string; created_at: string }) => (
-            <div key={a.id} className="flex gap-4 bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900/50 rounded-2xl px-5 py-4">
+            <div key={a.id} className="flex gap-4 bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900/50 rounded-lg px-5 py-4">
               <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0 mt-0.5">
                 <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
               </div>
@@ -123,9 +124,9 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         {STATS.map((s) => (
-          <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div key={s.label} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>{s.icon}</div>
+              <div className={`w-10 h-10 rounded-md flex items-center justify-center ${s.color}`}>{s.icon}</div>
             </div>
             <div className="font-display text-3xl font-light text-gray-900 dark:text-white leading-none mb-1">{s.value}</div>
             <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{s.label}</div>
@@ -135,7 +136,7 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-6 py-5 border-b border-gray-50 dark:border-gray-800">
             <div>
               <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-1"><span className="w-4 h-px bg-accent" />Schedule</span>
@@ -153,7 +154,7 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
               const d = new Date(reg.events.date);
               return (
                 <div key={reg.event_id} className="flex items-start gap-4 px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                  <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-950/50 border border-brand-100 dark:border-brand-900/50 flex flex-col items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-md bg-brand-50 dark:bg-brand-950/50 border border-brand-100 dark:border-brand-900/50 flex flex-col items-center justify-center shrink-0">
                     <span className="font-bold text-brand-900 dark:text-brand-300 text-lg leading-none">{d.getDate()}</span>
                     <span className="text-brand-500 dark:text-brand-500 text-[10px] uppercase tracking-wide">{d.toLocaleDateString('en-US', { month: 'short' })}</span>
                   </div>
@@ -168,7 +169,7 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-50 dark:border-gray-800">
             <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-1"><span className="w-4 h-px bg-accent" />History</span>
             <h2 className="font-display font-light text-xl text-gray-900 dark:text-white">Recent Activity</h2>
@@ -194,22 +195,21 @@ export default async function DashboardOverviewPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-brand-950 via-brand-900 to-brand-950 rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-brand-950 via-brand-900 to-brand-950 rounded-lg p-6 sm:p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-accent/8 blur-[80px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-brand-400/10 blur-[60px] pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent/70 mb-3"><span className="w-4 h-px bg-accent/50" />Membership</span>
             <h3 className="font-display font-light text-2xl text-white mb-1">Community <em className="italic text-accent-muted">Member</em></h3>
-            <p className="text-brand-400 text-sm">Active since {joinedYear} · {hasPaid ? 'Paid membership' : 'Free membership'}</p>
+            <p className="text-brand-400 text-sm">Active since {joinedYear} · {hasPaid ? `${(payments ?? []).length} payment${(payments ?? []).length !== 1 ? 's' : ''} on record` : 'No payments yet'}</p>
           </div>
-          {!hasPaid && <PayButton />}
-          {hasPaid && (
-            <div className="shrink-0 flex items-center gap-2 bg-green-500/20 border border-green-500/30 text-green-300 font-semibold px-5 py-2.5 rounded-xl text-sm">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              Membership Paid
-            </div>
-          )}
+          <Link
+            href="/dashboard/membership"
+            className="shrink-0 flex items-center gap-2 bg-accent hover:bg-accent-hover text-brand-950 font-semibold px-5 py-2.5 rounded-md text-sm transition-all duration-200 shadow-[0_4px_15px_rgba(251,191,36,0.3)]"
+          >
+            My Payments →
+          </Link>
         </div>
       </div>
     </div>

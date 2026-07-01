@@ -228,19 +228,19 @@ export default function SignInPage() {
                       type="text"
                       inputMode="numeric"
                       pattern="[0-9]*"
-                      maxLength={8}
+                      maxLength={6}
                       required
                       autoFocus
                       value={code}
-                      onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
-                      placeholder="00000000"
+                      onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000"
                       className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl text-gray-900 text-2xl font-mono tracking-[0.5em] text-center placeholder:text-gray-300 placeholder:tracking-[0.5em] focus:outline-none focus:bg-white focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all duration-200"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    disabled={loading || code.length < 8}
+                    disabled={loading || code.length < 6}
                     className="btn-shimmer w-full bg-accent hover:bg-accent-hover disabled:opacity-60 disabled:cursor-not-allowed text-brand-950 font-semibold py-4 rounded-2xl transition-all duration-300 text-sm tracking-wide shadow-[0_8px_30px_rgba(251,191,36,0.3)] hover:shadow-[0_8px_40px_rgba(251,191,36,0.5)] hover:-translate-y-0.5"
                   >
                     {loading ? 'Verifying…' : 'Sign In →'}
