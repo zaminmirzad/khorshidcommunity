@@ -78,15 +78,16 @@ export default function SignUpPage() {
       return;
     }
 
-    // Create the member record
-    const { error: insertError } = await supabase.from('members').insert({
-      user_id: user.id,
-      email: user.email,
-      full_name: fullName,
+    // Create the member record via server route (requires service role)
+    const res = await fetch('/api/auth/complete-signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fullName }),
     });
+    const json = await res.json();
 
-    if (insertError) {
-      setError('Account created but profile setup failed. Please contact support.');
+    if (!res.ok) {
+      setError(json.error ?? 'Profile setup failed. Please contact support.');
       setLoading(false);
       return;
     }
