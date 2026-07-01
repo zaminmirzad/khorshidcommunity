@@ -39,7 +39,7 @@ export default function SignInPage() {
     });
 
     if (otpError) {
-      setError('Failed to send verification code. Please try again.');
+      setError(`OTP send failed: ${otpError.message}`);
       setLoading(false);
       return;
     }
@@ -57,7 +57,7 @@ export default function SignInPage() {
     const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
 
     if (error) {
-      setError('Invalid or expired code. Please try again.');
+      setError(error.message);
       setLoading(false);
       return;
     }
