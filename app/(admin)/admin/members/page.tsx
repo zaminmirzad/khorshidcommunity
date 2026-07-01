@@ -3,6 +3,14 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 
+type SubStatus = 'active' | 'trialing' | 'past_due' | 'unpaid' | 'canceled';
+
+type MemberSub = {
+  status: SubStatus;
+  stripe_subscription_id: string;
+  current_period_end: string | null;
+};
+
 type Member = {
   id: string;
   full_name: string;
@@ -12,6 +20,8 @@ type Member = {
   joined_at: string;
   avatar_url: string | null;
   active: boolean;
+  subscription_exempt: boolean;
+  member_subscriptions?: MemberSub[];
 };
 
 const FILTERS = ['All', 'admin', 'member'] as const;
@@ -23,12 +33,40 @@ type RowProps = {
   setConfirmDelete: (id: string | null) => void;
   changeRole: (m: Member, role: 'admin' | 'member') => void;
   toggleActive: (m: Member) => void;
+  toggleExempt: (m: Member) => void;
   deleteMember: (m: Member) => void;
 };
 
-function MemberRow({ m, acting, confirmDelete, setConfirmDelete, changeRole, toggleActive, deleteMember }: RowProps) {
+function SubBadge({ sub, exempt }: { sub?: MemberSub; exempt: boolean }) {
+  if (exempt) {
+    return (
+      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
+        Sub Exempt
+      </span>
+    );
+  }
+  if (!sub) return null;
+  const map: Record<SubStatus, { label: string; className: string }> = {
+    active:    { label: 'Subscribed',     className: 'bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400' },
+    trialing:  { label: 'Trial',          className: 'bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400' },
+    past_due:  { label: 'Past Due',       className: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400' },
+    unpaid:    { label: 'Unpaid',         className: 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' },
+    canceled: { label: 'Sub Cancelled',  className: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
+  };
+  const { label, className } = map[sub.status] ?? map.canceled;
+  return (
+    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${className}`}>
+      {label}
+    </span>
+  );
+}
+
+function MemberRow({ m, acting, confirmDelete, setConfirmDelete, changeRole, toggleActive, toggleExempt, deleteMember }: RowProps) {
   const isActing = acting === m.id;
   const isConfirmingDelete = confirmDelete === m.id;
+  const activeSub = m.member_subscriptions?.find((s) => s.status !== 'canceled');
+  const anySub = m.member_subscriptions?.[0];
+  const displaySub = activeSub ?? anySub;
 
   return (
     <div className="px-6 py-4">
@@ -45,6 +83,7 @@ function MemberRow({ m, acting, confirmDelete, setConfirmDelete, changeRole, tog
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${m.role === 'admin' ? 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400' : 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400'}`}>
               {m.role}
             </span>
+            <SubBadge sub={displaySub} exempt={m.subscription_exempt} />
           </div>
           <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{m.email}{m.phone ? ` · ${m.phone}` : ''}</p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
@@ -79,6 +118,14 @@ function MemberRow({ m, acting, confirmDelete, setConfirmDelete, changeRole, tog
                 Demote
               </button>
             )}
+            <button onClick={() => toggleExempt(m)}
+              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-all ${
+                m.subscription_exempt
+                  ? 'border-purple-200 dark:border-purple-800 text-purple-500 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/30'
+                  : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-purple-300 dark:hover:border-purple-700 hover:text-purple-500 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/30'
+              }`}>
+              {m.subscription_exempt ? 'Remove Exempt' : 'Sub Exempt'}
+            </button>
             <button onClick={() => toggleActive(m)}
               className={`text-xs font-semibold px-3 py-1.5 rounded-sm border transition-all ${
                 m.active
@@ -117,11 +164,12 @@ export default function MembersPage() {
   useEffect(() => {
     async function load() {
       const supabase = createClient();
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('members')
-        .select('*')
+        .select('*, member_subscriptions(status, stripe_subscription_id, current_period_end)')
         .order('joined_at', { ascending: false });
-      setMembers(data ?? []);
+      if (error) console.error('members load error:', error.message);
+      setMembers((data as Member[]) ?? []);
       setLoading(false);
     }
     load();
@@ -156,6 +204,22 @@ export default function MembersPage() {
     } else {
       const { error: e } = await res.json();
       setError(e ?? 'Failed to update status.');
+    }
+    setActing(null);
+  }
+
+  async function toggleExempt(member: Member) {
+    setActing(member.id);
+    const res = await fetch(`/api/admin/members/${member.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription_exempt: !member.subscription_exempt }),
+    });
+    if (res.ok) {
+      setMembers((prev) => prev.map((m) => m.id === member.id ? { ...m, subscription_exempt: !m.subscription_exempt } : m));
+    } else {
+      const { error: e } = await res.json();
+      setError(e ?? 'Failed to update subscription exemption.');
     }
     setActing(null);
   }
@@ -270,7 +334,7 @@ export default function MembersPage() {
         </button>
         <button
           onClick={() => {
-            const rows = [['Name', 'Email', 'Phone', 'Role', 'Status', 'Joined'].join(',')];
+            const rows = [['Name', 'Email', 'Phone', 'Role', 'Status', 'Sub Exempt', 'Joined'].join(',')];
             members.forEach((m) => {
               rows.push([
                 `"${m.full_name.replace(/"/g, '""')}"`,
@@ -278,6 +342,7 @@ export default function MembersPage() {
                 `"${(m.phone ?? '').replace(/"/g, '""')}"`,
                 m.role,
                 m.active ? 'Active' : 'Deactivated',
+                m.subscription_exempt ? 'Yes' : 'No',
                 new Date(m.joined_at).toLocaleDateString('en-US'),
               ].join(','));
             });
@@ -339,7 +404,19 @@ export default function MembersPage() {
         ) : (
           <>
             <div className="divide-y divide-gray-50 dark:divide-gray-800">
-              {activeFiltered.map((m) => <MemberRow key={m.id} m={m} acting={acting} confirmDelete={confirmDelete} setConfirmDelete={setConfirmDelete} changeRole={changeRole} toggleActive={toggleActive} deleteMember={deleteMember} />)}
+              {activeFiltered.map((m) => (
+                <MemberRow
+                  key={m.id}
+                  m={m}
+                  acting={acting}
+                  confirmDelete={confirmDelete}
+                  setConfirmDelete={setConfirmDelete}
+                  changeRole={changeRole}
+                  toggleActive={toggleActive}
+                  toggleExempt={toggleExempt}
+                  deleteMember={deleteMember}
+                />
+              ))}
               {activeFiltered.length === 0 && (
                 <div className="py-12 text-center text-gray-400 dark:text-gray-500 text-sm">No members found.</div>
               )}
@@ -363,7 +440,19 @@ export default function MembersPage() {
                 </button>
                 {deactivatedOpen && (
                   <div className="divide-y divide-gray-50 dark:divide-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
-                    {deactivatedFiltered.map((m) => <MemberRow key={m.id} m={m} acting={acting} confirmDelete={confirmDelete} setConfirmDelete={setConfirmDelete} changeRole={changeRole} toggleActive={toggleActive} deleteMember={deleteMember} />)}
+                    {deactivatedFiltered.map((m) => (
+                      <MemberRow
+                        key={m.id}
+                        m={m}
+                        acting={acting}
+                        confirmDelete={confirmDelete}
+                        setConfirmDelete={setConfirmDelete}
+                        changeRole={changeRole}
+                        toggleActive={toggleActive}
+                        toggleExempt={toggleExempt}
+                        deleteMember={deleteMember}
+                      />
+                    ))}
                   </div>
                 )}
               </div>

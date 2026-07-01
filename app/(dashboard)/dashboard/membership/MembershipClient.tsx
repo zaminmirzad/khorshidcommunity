@@ -22,16 +22,44 @@ type PaymentRow = {
   paid_at: string;
 };
 
+type SubStatus = 'active' | 'trialing' | 'past_due' | 'unpaid' | 'canceled';
+
+type Subscription = {
+  stripe_subscription_id: string;
+  status: SubStatus;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  cancel_at: string | null;
+  cancelled_at: string | null;
+};
+
+type SubscriptionFee = {
+  id: string;
+  name: string;
+  description: string | null;
+  amount: number;
+  currency: string;
+  stripe_price_id: string;
+};
+
 type Props = {
   products: Product[];
   hasFees: boolean;
   payments: PaymentRow[];
   paymentStatus?: string;
   sessionId?: string;
+  portalReturn?: boolean;
+  subscriptionExempt: boolean;
+  subscriptionFee: SubscriptionFee | null;
+  subscription: Subscription | null;
 };
 
 function fmt(amount: number, currency: string) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount / 100);
+}
+
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
 function PayBtn({ productId, assignmentId }: { productId: string; assignmentId?: string | null }) {
@@ -48,7 +76,6 @@ function PayBtn({ productId, assignmentId }: { productId: string; assignmentId?:
     });
     const { url, error: err } = await res.json();
     if (err || !url) { setLoading(false); setError(err ?? 'Could not start checkout. Please try again.'); return; }
-    // Remember which assignment is being paid so we only show "Confirming" on that card
     sessionStorage.setItem('pending_payment_id', assignmentId ?? productId);
     window.location.href = url;
   }
@@ -67,13 +94,169 @@ function PayBtn({ productId, assignmentId }: { productId: string; assignmentId?:
   );
 }
 
-export default function MembershipClient({ products, hasFees, payments, paymentStatus, sessionId }: Props) {
+function SubscribeBtn({ priceId }: { priceId: string }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handle() {
+    setLoading(true);
+    setError('');
+    const res = await fetch('/api/payments/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ priceId }),
+    });
+    const { url, error: err } = await res.json();
+    if (err || !url) { setLoading(false); setError(err ?? 'Could not start checkout.'); return; }
+    window.location.href = url;
+  }
+
+  return (
+    <div className="flex flex-col items-end gap-1">
+      <button
+        onClick={handle}
+        disabled={loading}
+        className="flex items-center gap-2 bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950 font-semibold px-5 py-2.5 rounded-md text-sm transition-all duration-200 shadow-[0_4px_15px_rgba(251,191,36,0.3)] hover:shadow-[0_4px_20px_rgba(251,191,36,0.5)]"
+      >
+        {loading ? 'Redirecting…' : 'Subscribe →'}
+      </button>
+      {error && <p className="text-xs text-red-500 text-right">{error}</p>}
+    </div>
+  );
+}
+
+function PortalBtn({ label = 'Manage →' }: { label?: string }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handle() {
+    setLoading(true);
+    setError('');
+    const res = await fetch('/api/payments/portal', { method: 'POST' });
+    const { url, error: err } = await res.json();
+    if (err || !url) { setLoading(false); setError(err ?? 'Could not open portal.'); return; }
+    window.location.href = url;
+  }
+
+  return (
+    <div className="flex flex-col items-end gap-1">
+      <button
+        onClick={handle}
+        disabled={loading}
+        className="flex items-center gap-2 px-5 py-2.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-60 transition-all"
+      >
+        {loading ? 'Opening…' : label}
+      </button>
+      {error && <p className="text-xs text-red-500 text-right">{error}</p>}
+    </div>
+  );
+}
+
+function SubscriptionCard({ fee, sub }: { fee: SubscriptionFee; sub: Subscription | null }) {
+  const status = sub?.status ?? null;
+
+  const isPaid = status === 'active' || status === 'trialing';
+  const isDue = status === 'past_due' || status === 'unpaid';
+  const isCancelled = status === 'canceled';
+  const cancellingAtEnd = isPaid && (sub?.cancel_at_period_end || !!sub?.cancel_at);
+  const cancelDate = sub?.cancel_at ?? sub?.current_period_end;
+
+  return (
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-snug">{fee.name}</h3>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
+              Monthly
+            </span>
+            {isPaid && !cancellingAtEnd && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400">
+                Paid
+              </span>
+            )}
+            {isDue && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                Due
+              </span>
+            )}
+            {isCancelled && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                Cancelled
+              </span>
+            )}
+            {cancellingAtEnd && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                Cancelling
+              </span>
+            )}
+          </div>
+          {fee.description && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">{fee.description}</p>
+          )}
+          {isPaid && sub?.current_period_end && !cancellingAtEnd && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              Renews on {fmtDate(sub.current_period_end)}
+            </p>
+          )}
+          {cancellingAtEnd && cancelDate && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              Active until {fmtDate(cancelDate)} — will not renew
+            </p>
+          )}
+          {isDue && sub?.current_period_end && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              Payment due — next attempt on {fmtDate(sub.current_period_end)}
+            </p>
+          )}
+          {isCancelled && sub?.cancelled_at && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              Cancelled on {fmtDate(sub.cancelled_at)}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-auto flex items-center justify-between">
+        <div>
+          <span className="font-display text-2xl font-light text-gray-900 dark:text-white">{fmt(fee.amount, fee.currency)}</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">/ month</span>
+        </div>
+        {!sub && <SubscribeBtn priceId={fee.stripe_price_id} />}
+        {isPaid && <PortalBtn label="Manage →" />}
+        {isDue && <PortalBtn label="Update Payment →" />}
+        {isCancelled && <SubscribeBtn priceId={fee.stripe_price_id} />}
+      </div>
+    </div>
+  );
+}
+
+export default function MembershipClient({
+  products,
+  hasFees,
+  payments,
+  paymentStatus,
+  sessionId,
+  portalReturn,
+  subscriptionExempt,
+  subscriptionFee,
+  subscription,
+}: Props) {
   const router = useRouter();
   const paymentPending = paymentStatus === 'success';
   const [verifying, setVerifying] = useState(paymentPending);
   const [verifyError, setVerifyError] = useState(false);
-  // ID of the specific assignment/product being confirmed — only that card shows "Confirming"
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+
+  // After returning from Customer Portal, refresh a couple of times to catch
+  // the incoming webhook that updates subscription status in the DB.
+  useEffect(() => {
+    if (!portalReturn) return;
+    const t1 = setTimeout(() => router.refresh(), 2000);
+    const t2 = setTimeout(() => router.refresh(), 6000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!paymentPending || !sessionId) {
@@ -81,7 +264,6 @@ export default function MembershipClient({ products, hasFees, payments, paymentS
       return;
     }
 
-    // Read which assignment was being paid before the Stripe redirect
     const pendingId = sessionStorage.getItem('pending_payment_id');
     if (pendingId) {
       setConfirmingId(pendingId);
@@ -117,6 +299,7 @@ export default function MembershipClient({ products, hasFees, payments, paymentS
   }, []);
 
   const allPaid = hasFees && products.length === 0;
+  const showSubscription = !subscriptionExempt && !!subscriptionFee;
 
   return (
     <div className="space-y-6">
@@ -149,48 +332,62 @@ export default function MembershipClient({ products, hasFees, payments, paymentS
         </div>
       )}
 
+      {/* Subscription card — always visible unless exempt or no subscription fee set up */}
+      {showSubscription && (
+        <div>
+          <h2 className="font-display font-light text-xl text-gray-900 dark:text-white mb-3">Membership Subscription</h2>
+          <SubscriptionCard fee={subscriptionFee!} sub={subscription} />
+        </div>
+      )}
+
+      {/* One-time fees */}
       {!hasFees ? (
         <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-12 text-center">
           <p className="text-gray-400 dark:text-gray-500 text-sm">No fees available yet. Check back soon.</p>
         </div>
       ) : allPaid && !verifying ? (
-        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-12 text-center">
-          <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-950/40 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-          </div>
-          <p className="font-medium text-gray-900 dark:text-white text-sm">You're all set</p>
-          <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">All payments have been completed.</p>
-        </div>
-      ) : products.length > 0 ? (
-        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {products.map((product) => {
-            const cardId = product.assignmentId ?? product.id;
-            const isConfirming = verifying && confirmingId === cardId;
-            return (
-            <div key={cardId} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col gap-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-snug">{product.name}</h3>
-                    {product.source === 'assigned' && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300">Assigned</span>
-                    )}
-                  </div>
-                  {product.label && <p className="text-xs font-medium text-accent mb-1">{product.label}</p>}
-                  {product.description && <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">{product.description}</p>}
-                  {product.note && <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 leading-relaxed italic">{product.note}</p>}
-                </div>
-              </div>
-              <div className="mt-auto flex items-center justify-between">
-                <span className="font-display text-2xl font-light text-gray-900 dark:text-white">{fmt(product.amount, product.currency)}</span>
-                {isConfirming
-                  ? <div className="text-xs text-gray-400 dark:text-gray-500 font-medium px-1">Confirming…</div>
-                  : <PayBtn productId={product.id} assignmentId={product.assignmentId} />
-                }
-              </div>
+        products.length === 0 && (
+          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-12 text-center">
+            <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-950/40 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
             </div>
-            );
-          })}
+            <p className="font-medium text-gray-900 dark:text-white text-sm">All fees paid</p>
+            <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">All one-time payments have been completed.</p>
+          </div>
+        )
+      ) : products.length > 0 ? (
+        <div>
+          <h2 className="font-display font-light text-xl text-gray-900 dark:text-white mb-3">Fees</h2>
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {products.map((product) => {
+              const cardId = product.assignmentId ?? product.id;
+              const isConfirming = verifying && confirmingId === cardId;
+              return (
+                <div key={cardId} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col gap-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-snug">{product.name}</h3>
+                        {product.source === 'assigned' && (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300">Assigned</span>
+                        )}
+                      </div>
+                      {product.label && <p className="text-xs font-medium text-accent mb-1">{product.label}</p>}
+                      {product.description && <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">{product.description}</p>}
+                      {product.note && <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 leading-relaxed italic">{product.note}</p>}
+                    </div>
+                  </div>
+                  <div className="mt-auto flex items-center justify-between">
+                    <span className="font-display text-2xl font-light text-gray-900 dark:text-white">{fmt(product.amount, product.currency)}</span>
+                    {isConfirming
+                      ? <div className="text-xs text-gray-400 dark:text-gray-500 font-medium px-1">Confirming…</div>
+                      : <PayBtn productId={product.id} assignmentId={product.assignmentId} />
+                    }
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       ) : null}
 

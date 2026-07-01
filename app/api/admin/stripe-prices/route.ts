@@ -23,6 +23,7 @@ export async function GET() {
       description: product.description ?? '',
       amount: price.unit_amount ?? 0,
       currency: price.currency,
+      is_recurring: price.type === 'recurring',
     };
   });
 

@@ -8,11 +8,13 @@ type StripePrice = {
   description: string;
   amount: number;
   currency: string;
+  is_recurring: boolean;
 };
 
 type Product = StripePrice & {
   id: string;
   active: boolean;
+  is_subscription: boolean;
   created_at: string;
 };
 
@@ -78,20 +80,38 @@ function ProductRow({ p, toggleActive, setAssignModal }: RowProps) {
     <div>
       <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white mb-0.5">{p.name}</p>
+          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">{p.name}</p>
+            {p.is_subscription && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
+                <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                Monthly
+              </span>
+            )}
+          </div>
           {p.description && <p className="text-xs text-gray-400 dark:text-gray-500">{p.description}</p>}
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{fmt(p.amount, p.currency)} · {p.stripe_price_id}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            {fmt(p.amount, p.currency)}{p.is_subscription ? ' / month' : ''} · {p.stripe_price_id}
+          </p>
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap">
-          <button
-            onClick={toggleExpand}
-            className={`text-xs font-semibold px-3 py-1.5 rounded-sm border transition-all ${expanded ? 'border-brand-300 dark:border-brand-700 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300' : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
-          >
-            {loadingAssignments ? 'Loading…' : expanded ? `Pending · ${pending}` : 'Pending'}
-          </button>
-          <button onClick={() => setAssignModal(p)} className="text-xs font-semibold px-3 py-1.5 rounded-sm bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors">
-            Assign
-          </button>
+          {p.is_subscription ? (
+            <span className="text-xs text-gray-400 dark:text-gray-500 px-3 py-1.5 border border-dashed border-gray-200 dark:border-gray-700 rounded-sm">
+              Global — no assignment needed
+            </span>
+          ) : (
+            <>
+              <button
+                onClick={toggleExpand}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-sm border transition-all ${expanded ? 'border-brand-300 dark:border-brand-700 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300' : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+              >
+                {loadingAssignments ? 'Loading…' : expanded ? `Pending · ${pending}` : 'Pending'}
+              </button>
+              <button onClick={() => setAssignModal(p)} className="text-xs font-semibold px-3 py-1.5 rounded-sm bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors">
+                Assign
+              </button>
+            </>
+          )}
           <button onClick={() => toggleActive(p)} className={`text-xs font-semibold px-3 py-1.5 rounded-sm border transition-all ${p.active ? 'border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30' : 'border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/30'}`}>
             {p.active ? 'Deactivate' : 'Activate'}
           </button>
@@ -205,7 +225,7 @@ export default function ProductsPage() {
     const res = await fetch('/api/admin/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(price),
+      body: JSON.stringify({ ...price, is_subscription: price.is_recurring }),
     });
     const json = await res.json();
     setSavingPriceId(null);
@@ -314,8 +334,17 @@ export default function ProductsPage() {
               return (
                 <div key={price.stripe_price_id} className="flex items-center justify-between px-6 py-4">
                   <div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{price.name}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{fmt(price.amount, price.currency)} · {price.stripe_price_id}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{price.name}</p>
+                      {price.is_recurring && (
+                        <span className="text-[10px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
+                          Monthly
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                      {fmt(price.amount, price.currency)}{price.is_recurring ? ' / month' : ''} · {price.stripe_price_id}
+                    </p>
                     {price.description && <p className="text-xs text-gray-400 dark:text-gray-500">{price.description}</p>}
                   </div>
                   <button

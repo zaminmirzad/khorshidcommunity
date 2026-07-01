@@ -20,14 +20,16 @@ export async function POST(request: Request) {
   if (!await verifyAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
 
   const body = await request.json();
-  const { name, description, stripe_price_id, stripe_product_id, amount, currency } = body;
+  const { name, description, stripe_price_id, stripe_product_id, amount, currency, is_subscription } = body;
   if (!name || !stripe_price_id || !amount) {
     return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
   }
 
   const admin = createAdminClient();
   const { data, error } = await admin.from('fees').insert({
-    name, description, stripe_price_id, stripe_product_id, amount, currency: currency ?? 'usd',
+    name, description, stripe_price_id, stripe_product_id, amount,
+    currency: currency ?? 'usd',
+    is_subscription: is_subscription ?? false,
   }).select().single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

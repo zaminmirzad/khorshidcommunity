@@ -34,6 +34,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ ok: true });
   }
 
+  if ('subscription_exempt' in body) {
+    const { error } = await admin.from('members').update({ subscription_exempt: !!body.subscription_exempt }).eq('id', id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
   return NextResponse.json({ error: 'Nothing to update.' }, { status: 400 });
 }
 
