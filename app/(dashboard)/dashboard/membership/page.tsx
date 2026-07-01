@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import MembershipClient from './MembershipClient';
 
-type Props = { searchParams: Promise<{ payment?: string }> };
+type Props = { searchParams: Promise<{ payment?: string; session_id?: string }> };
 
 export default async function MembershipPage({ searchParams }: Props) {
-  const { payment } = await searchParams;
+  const { payment, session_id } = await searchParams;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -19,36 +19,46 @@ export default async function MembershipPage({ searchParams }: Props) {
 
   if (!member) redirect('/sign-in');
 
-  const [{ data: publicProducts }, { data: assignedProducts }, { data: payments }] = await Promise.all([
-    supabase.from('products').select('*').eq('active', true).eq('is_public', true).order('created_at'),
-    supabase
-      .from('member_products')
-      .select('note, assigned_at, products(*)')
+  const admin = createAdminClient();
+
+  const [{ data: myAssignments }, { data: payments }] = await Promise.all([
+    admin
+      .from('fee_assignments')
+      .select('id, note, assigned_at, label, paid, fees(*)')
       .eq('member_id', member.id),
-    supabase.from('payments').select('stripe_price_id, product_id, status').eq('member_id', member.id).eq('status', 'paid'),
+    supabase
+      .from('payments')
+      .select('id, product_id, stripe_price_id, description, amount, currency, status, paid_at')
+      .eq('member_id', member.id)
+      .eq('status', 'paid')
+      .order('paid_at', { ascending: false }),
   ]);
 
-  type AssignedRow = { note: string | null; assigned_at: string; products: Record<string, unknown> };
+  type FeeRecord = { id: string; name: string; description: string | null; amount: number; currency: string; stripe_price_id: string; active: boolean };
+  type AssignmentRow = { id: string; note: string | null; assigned_at: string; label: string | null; paid: boolean; fees: FeeRecord };
+  type PaymentRow = { id: string; product_id: string | null; stripe_price_id: string | null; description: string; amount: number; currency: string; status: string; paid_at: string };
 
-  const assignedProductsList = (assignedProducts ?? []).map((a) => {
-    const row = a as unknown as AssignedRow;
-    return { ...(row.products), note: row.note, assigned_at: row.assigned_at };
-  });
+  const paymentList = (payments ?? []) as PaymentRow[];
 
-  const allProducts = [
-    ...assignedProductsList.map((p) => ({ ...p, source: 'assigned' as const })),
-    ...(publicProducts ?? [])
-      .filter((p) => !assignedProductsList.some((a) => (a as Record<string, unknown>).id === p.id))
-      .map((p) => ({ ...p, source: 'public' as const })),
-  ];
+  const allProducts = ((myAssignments ?? []) as unknown as AssignmentRow[])
+    .filter((a) => !a.paid && a.fees?.id && a.fees?.active !== false)
+    .map((a) => ({
+      ...a.fees,
+      note: a.note,
+      label: a.label,
+      assignmentId: a.id,
+      source: 'assigned' as const,
+    }));
 
-  const paidProductIds = new Set((payments ?? []).map((p: { product_id: string | null }) => p.product_id).filter(Boolean));
+  const hasFees = allProducts.length > 0 || paymentList.length > 0;
 
   return (
     <MembershipClient
       products={allProducts}
-      paidProductIds={Array.from(paidProductIds) as string[]}
+      hasFees={hasFees}
+      payments={paymentList}
       paymentStatus={payment}
+      sessionId={session_id}
     />
   );
 }

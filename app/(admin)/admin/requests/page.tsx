@@ -83,19 +83,19 @@ export default function RequestsPage() {
       </div>
 
       {actionError && (
-        <div className="px-4 py-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm flex items-center justify-between gap-3">
+        <div className="px-4 py-3 rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm flex items-center justify-between gap-3">
           <span>{actionError}</span>
           <button onClick={() => setActionError(null)} className="text-red-400 hover:text-red-600 transition-colors shrink-0">✕</button>
         </div>
       )}
 
       {/* Filter tabs */}
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-md w-fit">
         {STATUS_FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${filter === f ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+            className={`px-4 py-1.5 rounded-sm text-sm font-medium capitalize transition-all ${filter === f ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
           >
             {f}
             {f === 'pending' && pendingCount > 0 && (
@@ -105,7 +105,7 @@ export default function RequestsPage() {
         ))}
       </div>
 
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
         {loading ? (
           <div className="py-16 text-center text-gray-400 dark:text-gray-500 text-sm">Loading…</div>
         ) : filtered.length === 0 ? (
@@ -140,7 +140,7 @@ export default function RequestsPage() {
                         </button>
                       )}
                       {isExpanded && req.message && (
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3 leading-relaxed">{req.message}</p>
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded-md px-4 py-3 leading-relaxed">{req.message}</p>
                       )}
                     </div>
                     {req.status === 'pending' && (
@@ -148,7 +148,7 @@ export default function RequestsPage() {
                         <button
                           onClick={() => handleApprove(req)}
                           disabled={isActioning}
-                          className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition-colors"
+                          className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-semibold px-3.5 py-2 rounded-md transition-colors"
                         >
                           {isActioning ? '…' : (
                             <>
@@ -160,7 +160,7 @@ export default function RequestsPage() {
                         <button
                           onClick={() => handleReject(req)}
                           disabled={isActioning}
-                          className="inline-flex items-center gap-1.5 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 disabled:opacity-50 text-xs font-semibold px-3.5 py-2 rounded-xl transition-colors"
+                          className="inline-flex items-center gap-1.5 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 disabled:opacity-50 text-xs font-semibold px-3.5 py-2 rounded-md transition-colors"
                         >
                           {isActioning ? '…' : 'Reject'}
                         </button>

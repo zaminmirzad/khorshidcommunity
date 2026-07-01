@@ -98,9 +98,9 @@ export default function ContentPage() {
         </h1>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-md w-fit">
         {TABS.map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${tab === t ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>{t}</button>
+          <button key={t} onClick={() => setTab(t)} className={`px-5 py-2 rounded-sm text-sm font-medium transition-all ${tab === t ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>{t}</button>
         ))}
       </div>
 
@@ -111,25 +111,25 @@ export default function ContentPage() {
             <div className="space-y-3">
               <p className="text-sm text-gray-500 dark:text-gray-400">Edit the stats shown on the homepage. Changes are live immediately.</p>
               {stats.map((stat) => (
-                <div key={stat.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
+                <div key={stat.id} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-5">
                   <div className="grid sm:grid-cols-4 gap-3 items-end">
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Icon</label>
-                      <input value={stat.icon} onChange={(e) => setStats((prev) => prev.map((s) => s.id === stat.id ? { ...s, icon: e.target.value } : s))} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
+                      <input value={stat.icon} onChange={(e) => setStats((prev) => prev.map((s) => s.id === stat.id ? { ...s, icon: e.target.value } : s))} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Number</label>
-                      <input value={stat.number} onChange={(e) => setStats((prev) => prev.map((s) => s.id === stat.id ? { ...s, number: e.target.value } : s))} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
+                      <input value={stat.number} onChange={(e) => setStats((prev) => prev.map((s) => s.id === stat.id ? { ...s, number: e.target.value } : s))} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Label (EN)</label>
-                      <input value={stat.label_en} onChange={(e) => setStats((prev) => prev.map((s) => s.id === stat.id ? { ...s, label_en: e.target.value } : s))} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
+                      <input value={stat.label_en} onChange={(e) => setStats((prev) => prev.map((s) => s.id === stat.id ? { ...s, label_en: e.target.value } : s))} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Label (FA)</label>
                       <div className="flex gap-2">
-                        <input value={stat.label_fa ?? ''} onChange={(e) => setStats((prev) => prev.map((s) => s.id === stat.id ? { ...s, label_fa: e.target.value } : s))} dir="rtl" className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
-                        <button onClick={() => saveStat(stat)} disabled={saving === stat.id} className="px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950 text-sm font-semibold transition-all shrink-0">
+                        <input value={stat.label_fa ?? ''} onChange={(e) => setStats((prev) => prev.map((s) => s.id === stat.id ? { ...s, label_fa: e.target.value } : s))} dir="rtl" className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
+                        <button onClick={() => saveStat(stat)} disabled={saving === stat.id} className="px-4 py-2.5 rounded-md bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950 text-sm font-semibold transition-all shrink-0">
                           {saving === stat.id ? '…' : 'Save'}
                         </button>
                       </div>
@@ -144,49 +144,49 @@ export default function ContentPage() {
           {tab === 'Programs' && (
             <div className="space-y-4">
               <div className="flex justify-end">
-                <button onClick={() => setShowProgForm(!showProgForm)} className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-brand-950 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all shadow-[0_4px_12px_rgba(251,191,36,0.25)]">
+                <button onClick={() => setShowProgForm(!showProgForm)} className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-brand-950 font-semibold px-5 py-2.5 rounded-md text-sm transition-all shadow-[0_4px_12px_rgba(251,191,36,0.25)]">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                   Add Program
                 </button>
               </div>
               {showProgForm && (
-                <div className="bg-white dark:bg-gray-900 rounded-2xl border border-accent/30 shadow-sm p-6">
+                <div className="bg-white dark:bg-gray-900 rounded-lg border border-accent/30 shadow-sm p-6">
                   <form onSubmit={addProgram} className="space-y-4">
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Icon (emoji)</label>
-                        <input value={progForm.icon} onChange={(e) => setProgForm({ ...progForm, icon: e.target.value })} className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
+                        <input value={progForm.icon} onChange={(e) => setProgForm({ ...progForm, icon: e.target.value })} className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Title (EN) *</label>
-                        <input value={progForm.title_en} onChange={(e) => setProgForm({ ...progForm, title_en: e.target.value })} required className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
+                        <input value={progForm.title_en} onChange={(e) => setProgForm({ ...progForm, title_en: e.target.value })} required className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Title (FA)</label>
-                        <input value={progForm.title_fa} onChange={(e) => setProgForm({ ...progForm, title_fa: e.target.value })} dir="rtl" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
+                        <input value={progForm.title_fa} onChange={(e) => setProgForm({ ...progForm, title_fa: e.target.value })} dir="rtl" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Description (EN)</label>
-                        <textarea value={progForm.desc_en} onChange={(e) => setProgForm({ ...progForm, desc_en: e.target.value })} rows={3} className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
+                        <textarea value={progForm.desc_en} onChange={(e) => setProgForm({ ...progForm, desc_en: e.target.value })} rows={3} className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Description (FA)</label>
-                        <textarea value={progForm.desc_fa} onChange={(e) => setProgForm({ ...progForm, desc_fa: e.target.value })} rows={3} dir="rtl" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
+                        <textarea value={progForm.desc_fa} onChange={(e) => setProgForm({ ...progForm, desc_fa: e.target.value })} rows={3} dir="rtl" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all text-gray-900 dark:text-white" />
                       </div>
                     </div>
                     {error && <p className="text-sm text-red-500">{error}</p>}
                     <div className="flex justify-end gap-2">
-                      <button type="button" onClick={() => setShowProgForm(false)} className="px-4 py-2 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-                      <button type="submit" disabled={saving === 'prog'} className="px-5 py-2 rounded-xl text-sm font-semibold bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950">{saving === 'prog' ? 'Adding…' : 'Add Program'}</button>
+                      <button type="button" onClick={() => setShowProgForm(false)} className="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
+                      <button type="submit" disabled={saving === 'prog'} className="px-5 py-2 rounded-md text-sm font-semibold bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950">{saving === 'prog' ? 'Adding…' : 'Add Program'}</button>
                     </div>
                   </form>
                 </div>
               )}
               <div className="space-y-2">
                 {programs.map((p) => (
-                  <div key={p.id} className="flex items-start gap-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm px-5 py-4">
+                  <div key={p.id} className="flex items-start gap-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm px-5 py-4">
                     <span className="text-2xl shrink-0 mt-0.5">{p.icon}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
@@ -197,8 +197,8 @@ export default function ContentPage() {
                       {p.desc_en && <p className="text-xs text-gray-400 dark:text-gray-500 line-clamp-2">{p.desc_en}</p>}
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <button onClick={() => toggleProgram(p)} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{p.active ? 'Hide' : 'Show'}</button>
-                      <button onClick={() => deleteProgram(p.id)} className="text-xs font-medium px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors">Delete</button>
+                      <button onClick={() => toggleProgram(p)} className="text-xs font-medium px-3 py-1.5 rounded-sm border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{p.active ? 'Hide' : 'Show'}</button>
+                      <button onClick={() => deleteProgram(p.id)} className="text-xs font-medium px-3 py-1.5 rounded-sm bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors">Delete</button>
                     </div>
                   </div>
                 ))}
@@ -211,39 +211,39 @@ export default function ContentPage() {
           {tab === 'Testimonials' && (
             <div className="space-y-4">
               <div className="flex justify-end">
-                <button onClick={() => setShowTestForm(!showTestForm)} className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-brand-950 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all shadow-[0_4px_12px_rgba(251,191,36,0.25)]">
+                <button onClick={() => setShowTestForm(!showTestForm)} className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-brand-950 font-semibold px-5 py-2.5 rounded-md text-sm transition-all shadow-[0_4px_12px_rgba(251,191,36,0.25)]">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                   Add Testimonial
                 </button>
               </div>
               {showTestForm && (
-                <div className="bg-white dark:bg-gray-900 rounded-2xl border border-accent/30 shadow-sm p-6">
+                <div className="bg-white dark:bg-gray-900 rounded-lg border border-accent/30 shadow-sm p-6">
                   <form onSubmit={addTestimonial} className="space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Name *</label>
-                        <input value={testForm.name} onChange={(e) => setTestForm({ ...testForm, name: e.target.value })} required placeholder="e.g. Maryam K." className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
+                        <input value={testForm.name} onChange={(e) => setTestForm({ ...testForm, name: e.target.value })} required placeholder="e.g. Maryam K." className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Role / Label</label>
-                        <input value={testForm.role_label} onChange={(e) => setTestForm({ ...testForm, role_label: e.target.value })} placeholder="e.g. Member since 2015" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
+                        <input value={testForm.role_label} onChange={(e) => setTestForm({ ...testForm, role_label: e.target.value })} placeholder="e.g. Member since 2015" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
                       </div>
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Quote *</label>
-                      <textarea value={testForm.quote} onChange={(e) => setTestForm({ ...testForm, quote: e.target.value })} required rows={3} className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
+                      <textarea value={testForm.quote} onChange={(e) => setTestForm({ ...testForm, quote: e.target.value })} required rows={3} className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all" />
                     </div>
                     {error && <p className="text-sm text-red-500">{error}</p>}
                     <div className="flex justify-end gap-2">
-                      <button type="button" onClick={() => setShowTestForm(false)} className="px-4 py-2 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-                      <button type="submit" disabled={saving === 'test'} className="px-5 py-2 rounded-xl text-sm font-semibold bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950">{saving === 'test' ? 'Adding…' : 'Add Testimonial'}</button>
+                      <button type="button" onClick={() => setShowTestForm(false)} className="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
+                      <button type="submit" disabled={saving === 'test'} className="px-5 py-2 rounded-md text-sm font-semibold bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950">{saving === 'test' ? 'Adding…' : 'Add Testimonial'}</button>
                     </div>
                   </form>
                 </div>
               )}
               <div className="space-y-2">
                 {testimonials.map((t) => (
-                  <div key={t.id} className="flex items-start gap-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm px-5 py-4">
+                  <div key={t.id} className="flex items-start gap-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm px-5 py-4">
                     <div className="w-9 h-9 rounded-full bg-brand-50 dark:bg-brand-950/50 border border-brand-100 dark:border-brand-900/50 flex items-center justify-center shrink-0">
                       <span className="font-display text-sm font-semibold text-brand-700 dark:text-brand-300">{t.name[0]}</span>
                     </div>
@@ -256,8 +256,8 @@ export default function ContentPage() {
                       <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 italic">&ldquo;{t.quote}&rdquo;</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <button onClick={() => toggleTestimonial(t)} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{t.active ? 'Hide' : 'Show'}</button>
-                      <button onClick={() => deleteTestimonial(t.id)} className="text-xs font-medium px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors">Delete</button>
+                      <button onClick={() => toggleTestimonial(t)} className="text-xs font-medium px-3 py-1.5 rounded-sm border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">{t.active ? 'Hide' : 'Show'}</button>
+                      <button onClick={() => deleteTestimonial(t.id)} className="text-xs font-medium px-3 py-1.5 rounded-sm bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors">Delete</button>
                     </div>
                   </div>
                 ))}

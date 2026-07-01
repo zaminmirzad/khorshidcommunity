@@ -12,7 +12,7 @@ async function verifyAdmin() {
 export async function GET() {
   if (!await verifyAdmin()) return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   const admin = createAdminClient();
-  const { data } = await admin.from('products').select('*').order('created_at', { ascending: false });
+  const { data } = await admin.from('fees').select('*').order('created_at', { ascending: false });
   return NextResponse.json(data ?? []);
 }
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   }
 
   const admin = createAdminClient();
-  const { data, error } = await admin.from('products').insert({
+  const { data, error } = await admin.from('fees').insert({
     name, description, stripe_price_id, stripe_product_id, amount, currency: currency ?? 'usd',
   }).select().single();
 

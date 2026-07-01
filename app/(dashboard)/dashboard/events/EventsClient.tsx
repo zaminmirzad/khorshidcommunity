@@ -25,6 +25,8 @@ export default function EventsClient({ events, registrationMap, memberId }: Prop
   const [tab, setTab] = useState<typeof TABS[number]>('Upcoming');
   const [regMap, setRegMap] = useState(registrationMap);
   const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
 
   const now = new Date();
   const upcoming = events.filter((e) => new Date(e.date) >= now);
@@ -33,18 +35,19 @@ export default function EventsClient({ events, registrationMap, memberId }: Prop
 
   async function register(eventId: string) {
     setLoading(eventId);
+    setError('');
     const res = await fetch('/api/events/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ eventId }),
     });
     if (res.ok) setRegMap((prev) => ({ ...prev, [eventId]: 'registered' }));
-    else { const { error } = await res.json(); alert(error ?? 'Could not register.'); }
+    else { const { error: e } = await res.json(); setError(e ?? 'Could not register. Please try again.'); }
     setLoading(null);
   }
 
   async function cancel(eventId: string) {
-    if (!confirm('Cancel your registration for this event?')) return;
+    setConfirmCancel(null);
     setLoading(eventId);
     const res = await fetch('/api/events/register', {
       method: 'DELETE',
@@ -61,16 +64,28 @@ export default function EventsClient({ events, registrationMap, memberId }: Prop
         <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-2">
           <span className="w-4 h-px bg-accent" />Community
         </span>
-        <h1 className="font-display font-light text-3xl sm:text-4xl text-gray-900 dark:text-white">
-          My <em className="italic text-brand-900 dark:text-brand-300">Events</em>
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="font-display font-light text-3xl sm:text-4xl text-gray-900 dark:text-white">
+            My <em className="italic text-brand-900 dark:text-brand-300">Events</em>
+          </h1>
+          <span className="inline-flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/50 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-[0.15em] px-2.5 py-1 rounded-sm">
+            Coming Soon
+          </span>
+        </div>
         <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-sm">Browse and register for community events.</p>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
+      {error && (
+        <div className="flex items-center justify-between gap-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md text-sm">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 shrink-0">✕</button>
+        </div>
+      )}
+
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-md w-fit">
         {TABS.map((t) => (
           <button key={t} onClick={() => setTab(t)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${tab === t ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
+            className={`px-4 py-1.5 rounded-sm text-sm font-medium transition-all ${tab === t ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}>
             {t} {t === 'Upcoming' ? `(${upcoming.length})` : `(${past.length})`}
           </button>
         ))}
@@ -91,9 +106,9 @@ export default function EventsClient({ events, registrationMap, memberId }: Prop
             const isPast = new Date(event.date) < now;
 
             return (
-              <div key={event.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
+              <div key={event.id} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-6">
                 <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-brand-50 dark:bg-brand-950/50 border border-brand-100 dark:border-brand-900/50 flex flex-col items-center justify-center shrink-0">
+                  <div className="w-14 h-14 rounded-md bg-brand-50 dark:bg-brand-950/50 border border-brand-100 dark:border-brand-900/50 flex flex-col items-center justify-center shrink-0">
                     <span className="font-bold text-brand-900 dark:text-brand-300 text-xl leading-none">
                       {new Date(event.date).getDate()}
                     </span>
@@ -123,13 +138,27 @@ export default function EventsClient({ events, registrationMap, memberId }: Prop
                       {!isPast && (
                         <div className="shrink-0">
                           {registered ? (
-                            <button onClick={() => cancel(event.id)} disabled={loading === event.id}
-                              className="text-xs font-semibold px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-red-200 dark:hover:border-red-800 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 disabled:opacity-60 transition-all">
-                              {loading === event.id ? 'Cancelling…' : 'Cancel'}
-                            </button>
+                            confirmCancel === event.id ? (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400">Are you sure?</span>
+                                <button onClick={() => cancel(event.id)} disabled={loading === event.id}
+                                  className="text-xs font-semibold px-3 py-1.5 rounded-sm bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 disabled:opacity-60 transition-all">
+                                  Yes, cancel
+                                </button>
+                                <button onClick={() => setConfirmCancel(null)}
+                                  className="text-xs font-semibold px-3 py-1.5 rounded-sm border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                                  Keep
+                                </button>
+                              </div>
+                            ) : (
+                              <button onClick={() => setConfirmCancel(event.id)} disabled={loading === event.id}
+                                className="text-xs font-semibold px-4 py-2 rounded-md border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-red-200 dark:hover:border-red-800 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 disabled:opacity-60 transition-all">
+                                {loading === event.id ? 'Cancelling…' : 'Cancel'}
+                              </button>
+                            )
                           ) : (
                             <button onClick={() => register(event.id)} disabled={loading === event.id || isFull}
-                              className="text-xs font-semibold px-4 py-2 rounded-xl bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950 shadow-[0_4px_12px_rgba(251,191,36,0.2)] transition-all">
+                              className="text-xs font-semibold px-4 py-2 rounded-md bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950 shadow-[0_4px_12px_rgba(251,191,36,0.2)] transition-all">
                               {loading === event.id ? 'Registering…' : isFull ? 'Full' : 'Register'}
                             </button>
                           )}

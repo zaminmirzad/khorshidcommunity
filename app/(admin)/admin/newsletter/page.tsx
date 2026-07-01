@@ -25,6 +25,7 @@ export default function NewsletterPage() {
   const [error, setError] = useState('');
   const [form, setForm] = useState({ subject: '', body: '', audience: 'all' });
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [showCompose, setShowCompose] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -57,8 +58,9 @@ export default function NewsletterPage() {
     setSending(false);
     setConfirmOpen(false);
     if (!res.ok) { setError(json.error ?? 'Failed to send.'); return; }
-    setSuccess(`Sent to ${json.recipient_count} member${json.recipient_count !== 1 ? 's' : ''}.`);
+    setShowCompose(false);
     setForm({ subject: '', body: '', audience: 'all' });
+    setSuccess(`Sent to ${json.recipient_count} member${json.recipient_count !== 1 ? 's' : ''}.`);
     const updated = await fetch('/api/admin/newsletter').then((r) => r.json());
     setSends(Array.isArray(updated) ? updated : []);
   }
@@ -67,14 +69,30 @@ export default function NewsletterPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-2">
-          <span className="w-4 h-px bg-accent" />Communications
-        </span>
-        <h1 className="font-display font-light text-3xl sm:text-4xl text-gray-900 dark:text-white">
-          <em className="italic text-brand-900 dark:text-brand-300">Newsletter</em>
-        </h1>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-2">
+            <span className="w-4 h-px bg-accent" />Communications
+          </span>
+          <h1 className="font-display font-light text-3xl sm:text-4xl text-gray-900 dark:text-white">
+            <em className="italic text-brand-900 dark:text-brand-300">Newsletter</em>
+          </h1>
+        </div>
+        <button
+          onClick={() => { setShowCompose(true); setError(''); setSuccess(''); }}
+          className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-brand-950 font-semibold px-5 py-2.5 rounded-md text-sm transition-all shadow-[0_4px_12px_rgba(251,191,36,0.25)]"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          Compose
+        </button>
       </div>
+
+      {success && (
+        <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 px-4 py-3 rounded-md">
+          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          {success}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
@@ -83,76 +101,78 @@ export default function NewsletterPage() {
           { label: 'Campaigns Sent', value: sends.length, icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>, color: 'bg-amber-50 dark:bg-amber-950/30 text-amber-600' },
           { label: 'Total Delivered', value: totalSent.toLocaleString(), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5l7 7-7 7" /></svg>, color: 'bg-purple-50 dark:bg-purple-950/30 text-purple-600' },
         ].map((s) => (
-          <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${s.color}`}>{s.icon}</div>
+          <div key={s.label} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-5">
+            <div className={`w-10 h-10 rounded-md flex items-center justify-center mb-3 ${s.color}`}>{s.icon}</div>
             <div className="font-display text-2xl font-light text-gray-900 dark:text-white leading-none mb-0.5">{s.value}</div>
             <div className="text-xs text-gray-400 dark:text-gray-500">{s.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-50 dark:border-gray-800">
-            <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-1">
-              <span className="w-4 h-px bg-accent" />Compose
-            </span>
-            <h2 className="font-display font-light text-xl text-gray-900 dark:text-white">Send Newsletter</h2>
-          </div>
-          <div className="p-6 space-y-4">
-            <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Subject Line</label>
-              <input
-                type="text"
-                value={form.subject}
-                onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                placeholder="July Community Update…"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Audience</label>
-              <select
-                value={form.audience}
-                onChange={(e) => setForm({ ...form, audience: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
-              >
-                {AUDIENCE_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label} ({o.value === 'paid' ? (paidCount ?? '…') : (memberCount ?? '…')})</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Message</label>
-              <textarea
-                rows={8}
-                value={form.body}
-                onChange={(e) => setForm({ ...form, body: e.target.value })}
-                placeholder="Write your newsletter content here…"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
-              />
-            </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            {success && (
-              <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 px-4 py-3 rounded-xl">
-                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                {success}
+      <div className={`grid gap-6 ${showCompose ? 'lg:grid-cols-5' : 'lg:grid-cols-1'}`}>
+        {showCompose && (
+          <div className="lg:col-span-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-50 dark:border-gray-800 flex items-center justify-between">
+              <div>
+                <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-1">
+                  <span className="w-4 h-px bg-accent" />Compose
+                </span>
+                <h2 className="font-display font-light text-xl text-gray-900 dark:text-white">Send Newsletter</h2>
               </div>
-            )}
-            <button
-              onClick={() => {
-                if (!form.subject.trim() || !form.body.trim()) { setError('Subject and message are required.'); return; }
-                setError('');
-                setConfirmOpen(true);
-              }}
-              className="w-full bg-accent hover:bg-accent-hover text-brand-950 font-semibold py-3 rounded-xl text-sm transition-all shadow-[0_4px_12px_rgba(251,191,36,0.25)]"
-            >
-              Send to {recipientCount} member{recipientCount !== 1 ? 's' : ''}
-            </button>
+              <button onClick={() => { setShowCompose(false); setError(''); setSuccess(''); setForm({ subject: '', body: '', audience: 'all' }); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Subject Line</label>
+                <input
+                  type="text"
+                  value={form.subject}
+                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                  placeholder="July Community Update…"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Audience</label>
+                <select
+                  value={form.audience}
+                  onChange={(e) => setForm({ ...form, audience: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
+                >
+                  {AUDIENCE_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label} ({o.value === 'paid' ? (paidCount ?? '…') : (memberCount ?? '…')})</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Message</label>
+                <textarea
+                  rows={8}
+                  value={form.body}
+                  onChange={(e) => setForm({ ...form, body: e.target.value })}
+                  placeholder="Write your newsletter content here…"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
+                />
+              </div>
+              {error && <p className="text-sm text-red-500">{error}</p>}
+              <button
+                onClick={() => {
+                  if (!form.subject.trim() || !form.body.trim()) { setError('Subject and message are required.'); return; }
+                  setError('');
+                  setConfirmOpen(true);
+                }}
+                className="w-full bg-accent hover:bg-accent-hover text-brand-950 font-semibold py-3 rounded-md text-sm transition-all shadow-[0_4px_12px_rgba(251,191,36,0.25)]"
+              >
+                Send to {recipientCount} member{recipientCount !== 1 ? 's' : ''}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div className={showCompose ? 'lg:col-span-2' : ''}>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-50 dark:border-gray-800">
             <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-1">
               <span className="w-4 h-px bg-accent" />History
@@ -175,11 +195,12 @@ export default function NewsletterPage() {
             ))}
           </div>
         </div>
+        </div>
       </div>
 
       {confirmOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl p-6 max-w-md w-full">
+          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-2xl p-6 max-w-md w-full">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Confirm Send</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
               You are about to send <span className="font-semibold text-gray-900 dark:text-white">&quot;{form.subject}&quot;</span> to{' '}
@@ -187,10 +208,10 @@ export default function NewsletterPage() {
             </p>
             <p className="text-xs text-amber-600 dark:text-amber-400 mb-5">This cannot be undone.</p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmOpen(false)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <button onClick={() => setConfirmOpen(false)} className="flex-1 px-4 py-2.5 rounded-md border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                 Cancel
               </button>
-              <button onClick={handleSend} disabled={sending} className="flex-1 px-4 py-2.5 rounded-xl bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950 text-sm font-semibold transition-all">
+              <button onClick={handleSend} disabled={sending} className="flex-1 px-4 py-2.5 rounded-md bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950 text-sm font-semibold transition-all">
                 {sending ? 'Sending…' : 'Confirm Send'}
               </button>
             </div>

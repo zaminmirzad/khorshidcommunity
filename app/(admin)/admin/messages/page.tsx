@@ -75,10 +75,10 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-md w-fit">
         {FILTERS.map((f) => (
           <button key={f} onClick={() => setFilter(f)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${filter === f ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+            className={`px-4 py-1.5 rounded-sm text-sm font-medium capitalize transition-all ${filter === f ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
           >
             {f}
           </button>
@@ -92,7 +92,7 @@ export default function MessagesPage() {
           <div className="py-12 text-center text-gray-400 dark:text-gray-500 text-sm">No messages.</div>
         ) : (
           filtered.map((s) => (
-            <div key={s.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div key={s.id} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
               <button className="w-full text-left px-6 py-4 flex items-start justify-between gap-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors" onClick={() => handleExpand(s)}>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -110,23 +110,23 @@ export default function MessagesPage() {
               {expanded === s.id && (
                 <div className="px-6 pb-5 border-t border-gray-50 dark:border-gray-800 pt-4 space-y-4">
                   {s.phone && <p className="text-xs text-gray-500 dark:text-gray-400">Phone: {s.phone}</p>}
-                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
+                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-md p-4">
                     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{s.message}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <a href={`mailto:${s.email}?subject=Re: ${encodeURIComponent(s.subject)}`}
-                      className="text-xs font-semibold px-4 py-2 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors">
+                      className="text-xs font-semibold px-4 py-2 rounded-md bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors">
                       Reply by email
                     </a>
                     {s.status !== 'resolved' && (
                       <button onClick={() => updateStatus(s.id, 'resolved')}
-                        className="text-xs font-semibold px-4 py-2 rounded-xl bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors">
+                        className="text-xs font-semibold px-4 py-2 rounded-md bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors">
                         Mark resolved
                       </button>
                     )}
                     {s.status === 'resolved' && (
                       <button onClick={() => updateStatus(s.id, 'read')}
-                        className="text-xs font-semibold px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        className="text-xs font-semibold px-4 py-2 rounded-md border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         Reopen
                       </button>
                     )}
