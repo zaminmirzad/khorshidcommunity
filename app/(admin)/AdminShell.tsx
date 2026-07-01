@@ -45,12 +45,12 @@ function SidebarContent({ memberName, pendingCount, unreadMessages, onNav, dark,
     {confirmSignOut && (
       <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setConfirmSignOut(false)} />
-        <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-800 p-6 w-full max-w-sm">
+        <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-800 p-6 w-full max-w-sm text-center">
           <h3 className="font-semibold text-gray-900 dark:text-white text-base mb-1">Sign out?</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">You'll need to sign in again to access your account.</p>
-          <div className="flex gap-3 justify-end">
-            <button onClick={() => setConfirmSignOut(false)} className="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-            <button onClick={signOut} className="px-5 py-2 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">Sign Out</button>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">You'll be returned to the sign-in page.</p>
+          <div className="flex gap-3">
+            <button onClick={() => setConfirmSignOut(false)} className="flex-1 px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">Cancel</button>
+            <button onClick={signOut} className="flex-1 px-4 py-2.5 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors whitespace-nowrap">Sign Out</button>
           </div>
         </div>
       </div>

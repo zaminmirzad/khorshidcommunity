@@ -23,35 +23,12 @@ const NAV_ITEMS = [
   { href: '/dashboard/settings', label: 'Settings', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
 ];
 
-function SidebarContent({ memberName, joinedAt, isAdmin, unreadAnnouncements, pendingFeeCount, onNav, dark, toggleTheme }: { memberName: string; joinedAt: string; isAdmin: boolean; unreadAnnouncements: number; pendingFeeCount: number; onNav?: () => void; dark: boolean; toggleTheme: () => void }) {
+function SidebarContent({ memberName, joinedAt, isAdmin, unreadAnnouncements, pendingFeeCount, onNav, dark, toggleTheme, onSignOutRequest }: { memberName: string; joinedAt: string; isAdmin: boolean; unreadAnnouncements: number; pendingFeeCount: number; onNav?: () => void; dark: boolean; toggleTheme: () => void; onSignOutRequest: () => void }) {
   const pathname = usePathname();
-  const router = useRouter();
   const initial = memberName ? memberName[0].toUpperCase() : 'M';
   const joinedYear = new Date(joinedAt).getFullYear();
-  const [confirmSignOut, setConfirmSignOut] = useState(false);
-
-  async function signOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push('/sign-in');
-    router.refresh();
-  }
 
   return (
-    <>
-    {confirmSignOut && (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setConfirmSignOut(false)} />
-        <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-800 p-6 w-full max-w-sm">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-base mb-1">Sign out?</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">You'll need to sign in again to access your account.</p>
-          <div className="flex gap-3 justify-end">
-            <button onClick={() => setConfirmSignOut(false)} className="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
-            <button onClick={signOut} className="px-5 py-2 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">Sign Out</button>
-          </div>
-        </div>
-      </div>
-    )}
     <div className="flex flex-col h-full bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800">
       <div className="px-5 py-5 border-b border-gray-100 dark:border-gray-800">
         <Link href="/" className="flex items-center gap-3 group w-fit">
@@ -103,7 +80,7 @@ function SidebarContent({ memberName, joinedAt, isAdmin, unreadAnnouncements, pe
             Admin Panel
           </Link>
         )}
-        <button onClick={() => setConfirmSignOut(true)} className="w-full flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-xs font-medium transition-colors px-3 py-2.5 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800/60">
+        <button onClick={onSignOutRequest} className="w-full flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-xs font-medium transition-colors px-3 py-2.5 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800/60">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
           Sign Out
         </button>
@@ -127,26 +104,50 @@ function SidebarContent({ memberName, joinedAt, isAdmin, unreadAnnouncements, pe
         </div>
       </div>
     </div>
-    </>
   );
 }
 
 export default function DashboardShell({ children, memberName, joinedAt, isAdmin, unreadAnnouncements, pendingFeeCount }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const { dark, toggle } = useTheme();
+  const router = useRouter();
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/sign-in');
+    router.refresh();
+  }
 
   return (
     <div className={dark ? 'dark' : ''} suppressHydrationWarning>
       <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
+
+        {/* Sign-out modal — at root level, outside any transformed container */}
+        {confirmSignOut && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setConfirmSignOut(false)} />
+            <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-800 p-6 w-full max-w-sm text-center">
+              <h3 className="font-semibold text-gray-900 dark:text-white text-base mb-1">Sign out?</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">You'll be returned to the sign-in page.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setConfirmSignOut(false)} className="flex-1 px-4 py-2.5 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">Cancel</button>
+                <button onClick={signOut} className="flex-1 px-4 py-2.5 rounded-md text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors whitespace-nowrap">Sign Out</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="hidden lg:block lg:w-64 lg:fixed lg:inset-y-0 shrink-0">
-          <SidebarContent memberName={memberName} joinedAt={joinedAt} isAdmin={isAdmin} unreadAnnouncements={unreadAnnouncements} pendingFeeCount={pendingFeeCount} dark={dark} toggleTheme={toggle} />
+          <SidebarContent memberName={memberName} joinedAt={joinedAt} isAdmin={isAdmin} unreadAnnouncements={unreadAnnouncements} pendingFeeCount={pendingFeeCount} dark={dark} toggleTheme={toggle} onSignOutRequest={() => setConfirmSignOut(true)} />
         </div>
 
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
         )}
         <div className={`fixed inset-y-0 left-0 z-50 w-64 lg:hidden transform transition-transform duration-300 ease-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <SidebarContent memberName={memberName} joinedAt={joinedAt} isAdmin={isAdmin} unreadAnnouncements={unreadAnnouncements} pendingFeeCount={pendingFeeCount} onNav={() => setSidebarOpen(false)} dark={dark} toggleTheme={toggle} />
+          <SidebarContent memberName={memberName} joinedAt={joinedAt} isAdmin={isAdmin} unreadAnnouncements={unreadAnnouncements} pendingFeeCount={pendingFeeCount} onNav={() => setSidebarOpen(false)} dark={dark} toggleTheme={toggle} onSignOutRequest={() => { setSidebarOpen(false); setConfirmSignOut(true); }} />
         </div>
 
         <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
