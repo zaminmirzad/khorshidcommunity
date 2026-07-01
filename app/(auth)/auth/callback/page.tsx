@@ -21,7 +21,7 @@ function AuthCallbackInner() {
       const type = searchParams.get('type');
       const next = searchParams.get('next') ?? '/dashboard';
 
-      // PKCE flow (forgot password uses this)
+      // PKCE flow (forgot password)
       if (code) {
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         if (error || !data.session) { setError('Invalid or expired link.'); return; }
@@ -30,17 +30,34 @@ function AuthCallbackInner() {
         return;
       }
 
-      // OTP / token-hash flow
+      // OTP token-hash flow
       if (token_hash && type) {
-        const { data, error } = await supabase.auth.verifyOtp({ token_hash, type: type as Parameters<typeof supabase.auth.verifyOtp>[0]['type'] });
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash,
+          type: type as Parameters<typeof supabase.auth.verifyOtp>[0]['type'],
+        });
         if (error || !data.session) { setError('Invalid or expired link.'); return; }
         if (type === 'recovery') { router.replace('/reset-password'); return; }
         router.replace(await resolveDestination(data.session.user.id, next, supabase));
         return;
       }
 
-      // Implicit / hash-based flow (invite emails land here)
-      // Supabase browser client auto-detects session from URL hash on init
+      // Implicit / hash flow — Supabase sends #access_token=xxx&refresh_token=xxx
+      const hash = typeof window !== 'undefined' ? window.location.hash.substring(1) : '';
+      const hashParams = new URLSearchParams(hash);
+      const access_token = hashParams.get('access_token');
+      const refresh_token = hashParams.get('refresh_token');
+      const hashType = hashParams.get('type');
+
+      if (access_token && refresh_token) {
+        const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
+        if (error || !data.session) { setError('Invalid or expired link.'); return; }
+        if (hashType === 'recovery') { router.replace('/reset-password'); return; }
+        router.replace(await resolveDestination(data.session.user.id, next, supabase));
+        return;
+      }
+
+      // Fallback: session may already be set
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         router.replace(await resolveDestination(data.session.user.id, next, supabase));
