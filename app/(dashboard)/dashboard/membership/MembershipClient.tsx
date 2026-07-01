@@ -48,6 +48,8 @@ function PayBtn({ productId, assignmentId }: { productId: string; assignmentId?:
     });
     const { url, error: err } = await res.json();
     if (err || !url) { setLoading(false); setError(err ?? 'Could not start checkout. Please try again.'); return; }
+    // Remember which assignment is being paid so we only show "Confirming" on that card
+    sessionStorage.setItem('pending_payment_id', assignmentId ?? productId);
     window.location.href = url;
   }
 
@@ -70,11 +72,20 @@ export default function MembershipClient({ products, hasFees, payments, paymentS
   const paymentPending = paymentStatus === 'success';
   const [verifying, setVerifying] = useState(paymentPending);
   const [verifyError, setVerifyError] = useState(false);
+  // ID of the specific assignment/product being confirmed — only that card shows "Confirming"
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!paymentPending || !sessionId) {
       setVerifying(false);
       return;
+    }
+
+    // Read which assignment was being paid before the Stripe redirect
+    const pendingId = sessionStorage.getItem('pending_payment_id');
+    if (pendingId) {
+      setConfirmingId(pendingId);
+      sessionStorage.removeItem('pending_payment_id');
     }
 
     let attempts = 0;
@@ -96,6 +107,7 @@ export default function MembershipClient({ products, hasFees, payments, paymentS
         setTimeout(tryVerify, 3000);
       } else {
         setVerifying(false);
+        setConfirmingId(null);
         setVerifyError(true);
       }
     }
@@ -151,8 +163,11 @@ export default function MembershipClient({ products, hasFees, payments, paymentS
         </div>
       ) : products.length > 0 ? (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {(verifying ? products : products).map((product) => (
-            <div key={product.assignmentId ?? product.id} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col gap-4">
+          {products.map((product) => {
+            const cardId = product.assignmentId ?? product.id;
+            const isConfirming = verifying && confirmingId === cardId;
+            return (
+            <div key={cardId} className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col gap-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -168,13 +183,14 @@ export default function MembershipClient({ products, hasFees, payments, paymentS
               </div>
               <div className="mt-auto flex items-center justify-between">
                 <span className="font-display text-2xl font-light text-gray-900 dark:text-white">{fmt(product.amount, product.currency)}</span>
-                {verifying
+                {isConfirming
                   ? <div className="text-xs text-gray-400 dark:text-gray-500 font-medium px-1">Confirming…</div>
                   : <PayBtn productId={product.id} assignmentId={product.assignmentId} />
                 }
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       ) : null}
 
