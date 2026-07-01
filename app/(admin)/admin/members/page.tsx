@@ -107,6 +107,12 @@ export default function MembersPage() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [deactivatedOpen, setDeactivatedOpen] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteName, setInviteName] = useState('');
+  const [inviting, setInviting] = useState(false);
+  const [inviteError, setInviteError] = useState('');
+  const [inviteSuccess, setInviteSuccess] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -167,6 +173,24 @@ export default function MembersPage() {
     setActing(null);
   }
 
+  async function sendInvite(e: React.FormEvent) {
+    e.preventDefault();
+    setInviting(true);
+    setInviteError('');
+    const res = await fetch('/api/admin/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: inviteEmail.trim(), fullName: inviteName.trim() }),
+    });
+    const json = await res.json();
+    setInviting(false);
+    if (!res.ok) { setInviteError(json.error ?? 'Failed to send invite.'); return; }
+    setInviteSuccess(`Invite sent to ${inviteEmail.trim()}`);
+    setInviteEmail('');
+    setInviteName('');
+    setTimeout(() => { setShowInvite(false); setInviteSuccess(''); }, 2000);
+  }
+
   const matchesSearch = (m: Member) =>
     m.full_name.toLowerCase().includes(search.toLowerCase()) || m.email.toLowerCase().includes(search.toLowerCase());
   const matchesFilter = (m: Member) => filter === 'All' || m.role === filter;
@@ -175,6 +199,58 @@ export default function MembersPage() {
   const deactivatedFiltered = members.filter((m) => !m.active && matchesSearch(m) && matchesFilter(m));
 
   return (
+    <>
+    {showInvite && (
+      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setShowInvite(false); setInviteError(''); setInviteSuccess(''); }} />
+        <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-800 p-6 w-full max-w-sm">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="font-semibold text-gray-900 dark:text-white text-base">Invite Member</h3>
+            <button onClick={() => { setShowInvite(false); setInviteError(''); setInviteSuccess(''); }} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          {inviteSuccess ? (
+            <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm py-4 justify-center">
+              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              {inviteSuccess}
+            </div>
+          ) : (
+            <form onSubmit={sendInvite} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={inviteName}
+                  onChange={(e) => setInviteName(e.target.value)}
+                  placeholder="Jane Smith"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="jane@example.com"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
+                />
+              </div>
+              {inviteError && <p className="text-sm text-red-500">{inviteError}</p>}
+              <div className="flex gap-3 justify-end pt-1">
+                <button type="button" onClick={() => { setShowInvite(false); setInviteError(''); }} className="px-4 py-2 rounded-md text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancel</button>
+                <button type="submit" disabled={inviting} className="px-5 py-2 rounded-md text-sm font-semibold bg-accent hover:bg-accent-hover disabled:opacity-60 text-brand-950 transition-all">
+                  {inviting ? 'Sending…' : 'Send Invite'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    )}
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
@@ -185,6 +261,13 @@ export default function MembersPage() {
             <em className="italic text-brand-900 dark:text-brand-300">Members</em>
           </h1>
         </div>
+        <button
+          onClick={() => setShowInvite(true)}
+          className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-brand-950 font-semibold px-5 py-2.5 rounded-md text-sm transition-all shadow-[0_4px_12px_rgba(251,191,36,0.25)]"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          Invite Member
+        </button>
         <button
           onClick={() => {
             const rows = [['Name', 'Email', 'Phone', 'Role', 'Status', 'Joined'].join(',')];
@@ -289,5 +372,6 @@ export default function MembersPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
