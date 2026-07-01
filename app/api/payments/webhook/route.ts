@@ -59,7 +59,10 @@ export async function POST(request: Request) {
           .maybeSingle();
 
         if (!existing) {
-          const { data: fee } = await admin.from('fees').select('name').eq('id', product_id).maybeSingle();
+          const [{ data: fee }, { data: memberSnap }] = await Promise.all([
+            admin.from('fees').select('name').eq('id', product_id).maybeSingle(),
+            admin.from('members').select('full_name, email').eq('id', member_id).maybeSingle(),
+          ]);
           const now = new Date().toISOString();
 
           await admin.from('payments').insert({
@@ -73,6 +76,8 @@ export async function POST(request: Request) {
             description: fee?.name ?? 'Payment',
             status: 'paid',
             paid_at: now,
+            member_name: memberSnap?.full_name ?? null,
+            member_email: memberSnap?.email ?? null,
           });
 
           if (fee_assignment_id) {
@@ -113,7 +118,10 @@ export async function POST(request: Request) {
             .maybeSingle();
 
           if (!existing) {
-            const { data: fee } = await admin.from('fees').select('name').eq('id', product_id).maybeSingle();
+            const [{ data: fee }, { data: memberSnap }] = await Promise.all([
+              admin.from('fees').select('name').eq('id', product_id).maybeSingle(),
+              admin.from('members').select('full_name, email').eq('id', member_id).maybeSingle(),
+            ]);
             await admin.from('payments').insert({
               member_id,
               product_id: product_id ?? null,
@@ -124,6 +132,8 @@ export async function POST(request: Request) {
               description: fee ? `${fee.name} — Monthly` : 'Monthly Subscription',
               status: 'paid',
               paid_at: new Date().toISOString(),
+              member_name: memberSnap?.full_name ?? null,
+              member_email: memberSnap?.email ?? null,
             });
           }
         }
@@ -154,9 +164,12 @@ export async function POST(request: Request) {
 
         if (!existing) {
           const priceId = invoicePriceId(invoice);
-          const { data: fee } = priceId
-            ? await admin.from('fees').select('name').eq('stripe_price_id', priceId).maybeSingle()
-            : { data: null };
+          const [{ data: fee }, { data: memberSnap }] = await Promise.all([
+            priceId
+              ? admin.from('fees').select('name').eq('stripe_price_id', priceId).maybeSingle()
+              : Promise.resolve({ data: null }),
+            admin.from('members').select('full_name, email').eq('id', memberSub.member_id).maybeSingle(),
+          ]);
 
           const paidAt = invoice.status_transitions?.paid_at
             ? toISO(invoice.status_transitions.paid_at)
@@ -171,6 +184,8 @@ export async function POST(request: Request) {
             description: fee ? `${fee.name} — Monthly` : 'Monthly Subscription',
             status: 'paid',
             paid_at: paidAt,
+            member_name: memberSnap?.full_name ?? null,
+            member_email: memberSnap?.email ?? null,
           });
         }
       }

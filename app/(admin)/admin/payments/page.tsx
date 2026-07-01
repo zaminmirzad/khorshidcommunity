@@ -11,6 +11,8 @@ type Payment = {
   status: string;
   paid_at: string;
   stripe_session_id: string;
+  member_name: string | null;
+  member_email: string | null;
   members: { full_name: string; email: string } | null;
   fees: { name: string } | null;
 };
@@ -29,13 +31,72 @@ function fmt(amount: number, currency: string) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount / 100);
 }
 
+function memberName(p: Payment) { return p.member_name ?? p.members?.full_name ?? ''; }
+function memberEmail(p: Payment) { return p.member_email ?? p.members?.email ?? ''; }
+
+async function exportPDF(payments: Payment[]) {
+  const { jsPDF } = await import('jspdf');
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+
+  const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('Khorshid Community — Payment History', 40, 40);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(`Generated ${dateStr} · ${payments.length} transaction${payments.length !== 1 ? 's' : ''}`, 40, 56);
+  doc.setTextColor(0);
+
+  const cols = ['Date', 'Member', 'Email', 'Product', 'Amount', 'Status'];
+  const colX = [40, 130, 250, 390, 500, 570];
+  const rowH = 20;
+  let y = 80;
+
+  const drawHeader = () => {
+    doc.setFillColor(30, 58, 138);
+    doc.rect(40, y - 13, 761, rowH, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(255);
+    cols.forEach((c, i) => doc.text(c, colX[i], y));
+    doc.setTextColor(0);
+    y += rowH;
+  };
+
+  drawHeader();
+
+  payments.forEach((p, idx) => {
+    if (y > 530) { doc.addPage(); y = 40; drawHeader(); }
+    if (idx % 2 === 0) { doc.setFillColor(245, 247, 250); doc.rect(40, y - 13, 761, rowH, 'F'); }
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    const row = [
+      new Date(p.paid_at).toLocaleDateString('en-US'),
+      memberName(p) || '—',
+      memberEmail(p),
+      p.fees?.name ?? p.description,
+      fmt(p.amount, p.currency),
+      p.status,
+    ];
+    row.forEach((v, i) => {
+      const maxW = (colX[i + 1] ?? 801) - colX[i] - 6;
+      const text = doc.splitTextToSize(String(v), maxW)[0] ?? '';
+      doc.text(text, colX[i], y);
+    });
+    y += rowH;
+  });
+
+  doc.save(`payments-${new Date().toISOString().split('T')[0]}.pdf`);
+}
+
 function exportCSV(payments: Payment[]) {
   const rows = [
     ['Date', 'Member', 'Email', 'Product', 'Amount', 'Status', 'Session ID'],
     ...payments.map((p) => [
       new Date(p.paid_at).toLocaleDateString('en-US'),
-      p.members?.full_name ?? '',
-      p.members?.email ?? '',
+      memberName(p),
+      memberEmail(p),
       p.fees?.name ?? p.description,
       fmt(p.amount, p.currency),
       p.status,
@@ -149,7 +210,7 @@ export default function PaymentsPage() {
     setLoading(true);
     const supabase = createClient();
     const [{ data: pays }, { data: mems }, { data: prods }] = await Promise.all([
-      supabase.from('payments').select('*, members(full_name, email), fees(name)').order('paid_at', { ascending: false }),
+      supabase.from('payments').select('*, member_name, member_email, members(full_name, email), fees(name)').order('paid_at', { ascending: false }),
       supabase.from('members').select('id, full_name, email, joined_at, avatar_url').order('joined_at', { ascending: false }),
       supabase.from('fees').select('id, name, amount, currency').eq('active', true),
     ]);
@@ -171,7 +232,7 @@ export default function PaymentsPage() {
 
   const filteredPayments = payments.filter((p) => {
     const q = search.toLowerCase();
-    return !q || p.members?.full_name.toLowerCase().includes(q) || p.members?.email.toLowerCase().includes(q) || (p.fees?.name ?? p.description).toLowerCase().includes(q);
+    return !q || memberName(p).toLowerCase().includes(q) || memberEmail(p).toLowerCase().includes(q) || (p.fees?.name ?? p.description).toLowerCase().includes(q);
   });
 
   const filteredMembers = members.filter((m) => {
@@ -195,11 +256,18 @@ export default function PaymentsPage() {
           </h1>
         </div>
         {tab === 'payments' && (
-          <button onClick={() => exportCSV(filteredPayments)}
-            className="flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-md border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-            Export CSV
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => exportCSV(filteredPayments)}
+              className="flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-md border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              CSV
+            </button>
+            <button onClick={() => exportPDF(filteredPayments)}
+              className="flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-md border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+              PDF
+            </button>
+          </div>
         )}
       </div>
 
@@ -261,8 +329,8 @@ export default function PaymentsPage() {
                         {new Date(p.paid_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' })}
                       </td>
                       <td className="px-6 py-3.5">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{p.members?.full_name ?? '—'}</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">{p.members?.email ?? ''}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{memberName(p) || '—'}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{memberEmail(p)}</p>
                       </td>
                       <td className="px-6 py-3.5 text-sm text-gray-600 dark:text-gray-300">{p.fees?.name ?? p.description}</td>
                       <td className="px-6 py-3.5 text-sm font-semibold text-gray-900 dark:text-white">{fmt(p.amount, p.currency)}</td>
