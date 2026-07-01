@@ -64,7 +64,10 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (!existingPayment && session.amount_total && session.amount_total > 0) {
-      const { data: fee } = await adminClient.from('fees').select('name').eq('id', product_id).maybeSingle();
+      const [{ data: fee }, { data: memberSnap }] = await Promise.all([
+        adminClient.from('fees').select('name').eq('id', product_id).maybeSingle(),
+        adminClient.from('members').select('full_name, email').eq('id', member_id).maybeSingle(),
+      ]);
       await adminClient.from('payments').insert({
         member_id,
         product_id: product_id ?? null,
@@ -75,6 +78,8 @@ export async function POST(request: Request) {
         description: fee ? `${fee.name} — Monthly` : 'Monthly Subscription',
         status: 'paid',
         paid_at: new Date().toISOString(),
+        member_name: memberSnap?.full_name ?? null,
+        member_email: memberSnap?.email ?? null,
       });
     }
 
@@ -90,11 +95,10 @@ export async function POST(request: Request) {
 
   if (existing) return NextResponse.json({ paid: true });
 
-  const { data: fee } = await adminClient
-    .from('fees')
-    .select('name')
-    .eq('id', product_id)
-    .maybeSingle();
+  const [{ data: fee }, { data: member }] = await Promise.all([
+    adminClient.from('fees').select('name').eq('id', product_id).maybeSingle(),
+    adminClient.from('members').select('full_name, email').eq('id', member_id).maybeSingle(),
+  ]);
 
   const now = new Date().toISOString();
 
@@ -109,6 +113,8 @@ export async function POST(request: Request) {
     description: fee?.name ?? 'Payment',
     status: 'paid',
     paid_at: now,
+    member_name: member?.full_name ?? null,
+    member_email: member?.email ?? null,
   });
 
   if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 });
@@ -118,7 +124,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { data: member } = await adminClient.from('members').select('full_name, email').eq('id', member_id).single();
     if (member?.email) {
       const amount = session.amount_total ?? 0;
       const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: session.currency ?? 'usd' }).format(amount / 100);

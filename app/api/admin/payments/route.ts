@@ -14,9 +14,12 @@ export async function POST(request: Request) {
 
   const adminClient = createAdminClient();
 
-  const { data: fee } = productId
-    ? await adminClient.from('fees').select('name, stripe_price_id').eq('id', productId).maybeSingle()
-    : { data: null };
+  const [{ data: fee }, { data: memberSnap }] = await Promise.all([
+    productId
+      ? adminClient.from('fees').select('name, stripe_price_id').eq('id', productId).maybeSingle()
+      : Promise.resolve({ data: null }),
+    adminClient.from('members').select('full_name, email').eq('id', memberId).maybeSingle(),
+  ]);
 
   const now = new Date().toISOString();
 
@@ -31,6 +34,8 @@ export async function POST(request: Request) {
     description: description || fee?.name || 'Manual payment',
     status: 'paid',
     paid_at: now,
+    member_name: memberSnap?.full_name ?? null,
+    member_email: memberSnap?.email ?? null,
   });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
