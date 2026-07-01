@@ -11,23 +11,23 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createClient();
 
-  function resolveRedirect(t: typeof type, fallback: string) {
-    if (t === 'recovery') return `${origin}/reset-password`;
-    if (t === 'invite') return `${origin}/sign-up`;
-    return `${origin}${fallback}`;
+  async function redirectForUser(userId: string) {
+    if (type === 'recovery') return `${origin}/reset-password`;
+    const { data: member } = await supabase.from('members').select('id').eq('user_id', userId).single();
+    return member ? `${origin}${next}` : `${origin}/sign-up`;
   }
 
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      return NextResponse.redirect(resolveRedirect(type, next));
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && data.session) {
+      return NextResponse.redirect(await redirectForUser(data.session.user.id));
     }
   }
 
   if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({ token_hash, type });
-    if (!error) {
-      return NextResponse.redirect(resolveRedirect(type, next));
+    const { data, error } = await supabase.auth.verifyOtp({ token_hash, type });
+    if (!error && data.session) {
+      return NextResponse.redirect(await redirectForUser(data.session.user.id));
     }
   }
 
