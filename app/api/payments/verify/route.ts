@@ -24,7 +24,64 @@ export async function POST(request: Request) {
   if (session.payment_status !== 'paid') return NextResponse.json({ paid: false });
 
   const adminClient = createAdminClient();
+  const { member_id, product_id, stripe_price_id, fee_assignment_id } = session.metadata ?? {};
+  if (!member_id) return NextResponse.json({ error: 'Missing metadata.' }, { status: 400 });
 
+  // ── Subscription checkout ─────────────────────────────────────────────────
+  if (session.mode === 'subscription' && session.subscription) {
+    const subscriptionId = session.subscription as string;
+    const customerId = session.customer as string;
+
+    // Ensure member_subscriptions row exists (webhook may not have fired yet)
+    const { data: existingSub } = await adminClient
+      .from('member_subscriptions')
+      .select('id')
+      .eq('stripe_subscription_id', subscriptionId)
+      .maybeSingle();
+
+    if (!existingSub) {
+      const sub = await stripe.subscriptions.retrieve(subscriptionId);
+      const item = sub.items.data[0];
+      await adminClient.from('member_subscriptions').upsert({
+        member_id,
+        stripe_subscription_id: subscriptionId,
+        stripe_customer_id: customerId,
+        status: sub.status,
+        current_period_start: item ? new Date(item.current_period_start * 1000).toISOString() : null,
+        current_period_end: item ? new Date(item.current_period_end * 1000).toISOString() : null,
+        cancel_at_period_end: sub.cancel_at_period_end,
+        cancel_at: sub.cancel_at ? new Date(sub.cancel_at * 1000).toISOString() : null,
+      }, { onConflict: 'stripe_subscription_id' });
+
+      await adminClient.from('members').update({ stripe_customer_id: customerId }).eq('id', member_id);
+    }
+
+    // Ensure payment history record exists
+    const { data: existingPayment } = await adminClient
+      .from('payments')
+      .select('id')
+      .eq('stripe_session_id', session.id)
+      .maybeSingle();
+
+    if (!existingPayment && session.amount_total && session.amount_total > 0) {
+      const { data: fee } = await adminClient.from('fees').select('name').eq('id', product_id).maybeSingle();
+      await adminClient.from('payments').insert({
+        member_id,
+        product_id: product_id ?? null,
+        stripe_session_id: session.id,
+        stripe_price_id: stripe_price_id ?? null,
+        amount: session.amount_total,
+        currency: session.currency ?? 'usd',
+        description: fee ? `${fee.name} — Monthly` : 'Monthly Subscription',
+        status: 'paid',
+        paid_at: new Date().toISOString(),
+      });
+    }
+
+    return NextResponse.json({ paid: true });
+  }
+
+  // ── One-time payment ──────────────────────────────────────────────────────
   const { data: existing } = await adminClient
     .from('payments')
     .select('id')
@@ -32,9 +89,6 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   if (existing) return NextResponse.json({ paid: true });
-
-  const { member_id, product_id, stripe_price_id, fee_assignment_id } = session.metadata ?? {};
-  if (!member_id) return NextResponse.json({ error: 'Missing metadata.' }, { status: 400 });
 
   const { data: fee } = await adminClient
     .from('fees')
